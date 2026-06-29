@@ -173,6 +173,8 @@ DigitalCard/
 
 路线图将随产品验证结果调整；功能完成后应以代码、测试和发布记录更新勾选状态。
 
+详细的小版本范围、依赖关系和验收标准见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
+
 ## 参与贡献
 
 欢迎通过 Issue 提交需求建议和问题反馈，也欢迎通过 Pull Request 参与建设。
