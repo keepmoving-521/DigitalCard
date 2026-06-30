@@ -220,6 +220,19 @@ async def test_department_with_active_employee_cannot_be_disabled(client: AsyncC
             department_id,
         )
         response = await admin_client.post(
+            "/api/v1/tenant/employees",
+            headers=headers(admin_session),
+            json={
+                "employee_no": "ENG-001",
+                "name": "Engineer",
+                "email": "engineer@example.com",
+                "department_id": department_id,
+                "user_id": employee["id"],
+            },
+        )
+        assert response.status_code == 201
+        employee_profile_id = response.json()["id"]
+        response = await admin_client.post(
             f"/api/v1/tenant/departments/{department_id}/status",
             headers=headers(admin_session),
             json={"is_active": False},
@@ -228,10 +241,10 @@ async def test_department_with_active_employee_cannot_be_disabled(client: AsyncC
         assert response.json()["error"]["code"] == "department_not_empty"
         assert response.json()["error"]["details"]["employee_count"] == 1
 
-        response = await client.patch(
-            f"/api/v1/admin/users/{employee['id']}/status",
-            headers=headers(platform_session),
-            json={"is_active": False},
+        response = await admin_client.post(
+            f"/api/v1/tenant/employees/{employee_profile_id}/status",
+            headers=headers(admin_session),
+            json={"status": "inactive"},
         )
         assert response.status_code == 200
         response = await admin_client.post(

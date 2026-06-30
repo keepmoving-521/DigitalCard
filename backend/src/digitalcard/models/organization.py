@@ -24,6 +24,11 @@ class CompanyStatus(StrEnum):
     SUSPENDED = "suspended"
 
 
+class InactiveEmployeeVisibility(StrEnum):
+    HIDDEN = "hidden"
+    SHOW_INACTIVE = "show_inactive"
+
+
 class Company(Base):
     __tablename__ = "companies"
 
@@ -37,6 +42,12 @@ class Company(Base):
     contact_phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
     status: Mapped[str] = mapped_column(String(32), default=CompanyStatus.ACTIVE.value, index=True)
+    inactive_employee_visibility: Mapped[str] = mapped_column(
+        String(32), default=InactiveEmployeeVisibility.HIDDEN.value
+    )
+    employee_self_editable_fields: Mapped[list[str]] = mapped_column(
+        JSON, default=lambda: ["avatar_url", "phone", "bio"]
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, onupdate=utc_now)
 

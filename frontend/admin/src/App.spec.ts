@@ -17,6 +17,8 @@ function testRouter() {
       { path: '/change-password', component: { template: '<div>Password</div>' } },
       { path: '/company/settings', component: { template: '<div>Company</div>' } },
       { path: '/company/departments', component: { template: '<div>Departments</div>' } },
+      { path: '/company/employees', component: { template: '<div>Employees</div>' } },
+      { path: '/profile', component: { template: '<div>Profile</div>' } },
       { path: '/company/roles', component: { template: '<div>Roles</div>' } },
       { path: '/company/audits', component: { template: '<div>Audits</div>' } },
       { path: '/platform/companies', component: { template: '<div>Companies</div>' } },
@@ -60,7 +62,7 @@ describe('Account foundation views', () => {
     authState.user = {
       id: 'user-1', email: 'content@example.com', display_name: '内容管理员',
       role: 'content_admin', company_id: 'company-1', department_id: null,
-      permissions: ['company.read', 'department.read', 'content.manage'], is_active: true,
+      permissions: ['company.read', 'department.read', 'employee.read', 'content.manage'], is_active: true,
       must_change_password: false, last_login_at: null, created_at: '', updated_at: '',
     }
     const router = testRouter()
@@ -72,6 +74,7 @@ describe('Account foundation views', () => {
     })
     expect(wrapper.find('a[href="/company/settings"]').exists()).toBe(true)
     expect(wrapper.find('a[href="/company/departments"]').exists()).toBe(true)
+    expect(wrapper.find('a[href="/company/employees"]').exists()).toBe(true)
     expect(wrapper.find('a[href="/company/roles"]').exists()).toBe(false)
     expect(wrapper.find('a[href="/admin/accounts"]').exists()).toBe(false)
   })

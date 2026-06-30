@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     jwt_issuer: str = "digitalcard-api"
     jwt_audience: str = "digitalcard-admin"
     refresh_cookie_name: str = "digitalcard_refresh"
+    invite_base_url: str = "http://localhost:5173/accept-invite"
+    invite_expire_hours: int = Field(default=72, ge=1, le=168)
 
     @property
     def cors_origins_list(self) -> list[str]:

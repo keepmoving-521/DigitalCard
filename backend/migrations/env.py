@@ -8,6 +8,8 @@ from digitalcard.db.base import Base
 from digitalcard.models import (  # noqa: F401
     Company,
     Department,
+    Employee,
+    EmployeeInvitation,
     LoginAudit,
     RefreshSession,
     RolePermission,

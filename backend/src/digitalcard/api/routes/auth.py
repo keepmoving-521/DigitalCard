@@ -19,6 +19,8 @@ from digitalcard.schemas.account import (
     SessionResponse,
     UserResponse,
 )
+from digitalcard.schemas.employee import InvitationAcceptRequest
+from digitalcard.services.invitations import accept_employee_invitation
 from digitalcard.services.passwords import (
     dummy_password_hash,
     hash_password,
@@ -35,6 +37,17 @@ from digitalcard.services.tokens import (
 )
 
 router = APIRouter(prefix="/auth")
+
+
+@router.post(
+    "/invitations/accept", status_code=status.HTTP_204_NO_CONTENT, summary="Accept invitation"
+)
+def accept_invitation(
+    payload: InvitationAcceptRequest,
+    db: Annotated[Session, Depends(get_db)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> None:
+    accept_employee_invitation(db, payload.token, payload.password, settings)
 
 
 def client_metadata(request: Request) -> tuple[str | None, str | None]:

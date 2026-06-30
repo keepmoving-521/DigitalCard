@@ -4,7 +4,9 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from digitalcard.models.account import UserRole
-from digitalcard.models.organization import CompanyStatus
+from digitalcard.models.organization import CompanyStatus, InactiveEmployeeVisibility
+
+SELF_EDITABLE_EMPLOYEE_FIELDS = {"avatar_url", "phone", "email", "bio"}
 
 CODE_PATTERN = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_-]{1,63}$")
 
@@ -24,11 +26,23 @@ class CompanyBase(BaseModel):
     contact_email: str | None = Field(default=None, max_length=320)
     contact_phone: str | None = Field(default=None, max_length=50)
     address: str | None = Field(default=None, max_length=500)
+    inactive_employee_visibility: InactiveEmployeeVisibility = InactiveEmployeeVisibility.HIDDEN
+    employee_self_editable_fields: list[str] = Field(
+        default_factory=lambda: ["avatar_url", "phone", "bio"]
+    )
 
     @field_validator("name")
     @classmethod
     def strip_name(cls, value: str) -> str:
         return value.strip()
+
+    @field_validator("employee_self_editable_fields")
+    @classmethod
+    def validate_self_editable_fields(cls, value: list[str]) -> list[str]:
+        invalid = set(value) - SELF_EDITABLE_EMPLOYEE_FIELDS
+        if invalid:
+            raise ValueError(f"Unsupported self-editable fields: {', '.join(sorted(invalid))}")
+        return sorted(set(value))
 
 
 class CompanyCreateRequest(CompanyBase):
@@ -45,6 +59,18 @@ class CompanyUpdateRequest(BaseModel):
     contact_email: str | None = Field(default=None, max_length=320)
     contact_phone: str | None = Field(default=None, max_length=50)
     address: str | None = Field(default=None, max_length=500)
+    inactive_employee_visibility: InactiveEmployeeVisibility | None = None
+    employee_self_editable_fields: list[str] | None = None
+
+    @field_validator("employee_self_editable_fields")
+    @classmethod
+    def validate_optional_self_editable_fields(cls, value: list[str] | None) -> list[str] | None:
+        if value is None:
+            return value
+        invalid = set(value) - SELF_EDITABLE_EMPLOYEE_FIELDS
+        if invalid:
+            raise ValueError(f"Unsupported self-editable fields: {', '.join(sorted(invalid))}")
+        return sorted(set(value))
 
 
 class CompanyStatusRequest(BaseModel):

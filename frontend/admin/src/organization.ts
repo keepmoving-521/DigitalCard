@@ -9,6 +9,8 @@ export interface Company {
   contact_phone: string | null
   address: string | null
   status: 'active' | 'suspended'
+  inactive_employee_visibility: 'hidden' | 'show_inactive'
+  employee_self_editable_fields: string[]
   created_at: string
   updated_at: string
 }
@@ -51,4 +53,3 @@ export interface TenantAudit {
   changes: Record<string, unknown> | null
   created_at: string
 }
-

@@ -8,6 +8,7 @@ from digitalcard.api.dependencies import require_permission
 from digitalcard.core.errors import AppError
 from digitalcard.db.session import get_db
 from digitalcard.models.account import User, UserRole
+from digitalcard.models.employee import Employee, EmployeeStatus
 from digitalcard.models.organization import (
     Company,
     Department,
@@ -84,6 +85,9 @@ def update_company(
     changes = payload.model_dump(exclude_unset=True)
     if changes.get("name") is None and "name" in changes:
         raise AppError("invalid_company_name", "Company name cannot be empty", 422)
+    policy_fields = {"inactive_employee_visibility", "employee_self_editable_fields"}
+    if any(changes.get(field) is None for field in policy_fields if field in changes):
+        raise AppError("invalid_company_policy", "Employee policies cannot be empty", 422)
     before = {key: getattr(company, key) for key in changes}
     for key, value in changes.items():
         setattr(company, key, value)
@@ -255,11 +259,11 @@ def set_department_status(
     if not payload.is_active:
         employee_count = db.scalar(
             select(func.count())
-            .select_from(User)
+            .select_from(Employee)
             .where(
-                User.company_id == user.company_id,
-                User.department_id == department.id,
-                User.is_active.is_(True),
+                Employee.company_id == user.company_id,
+                Employee.department_id == department.id,
+                Employee.status == EmployeeStatus.ACTIVE.value,
             )
         )
         child_count = db.scalar(

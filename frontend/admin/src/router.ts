@@ -10,12 +10,16 @@ import CompaniesView from './views/CompaniesView.vue'
 import CompanySettingsView from './views/CompanySettingsView.vue'
 import DepartmentsView from './views/DepartmentsView.vue'
 import RolesView from './views/RolesView.vue'
+import EmployeesView from './views/EmployeesView.vue'
+import MyProfileView from './views/MyProfileView.vue'
+import AcceptInviteView from './views/AcceptInviteView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', redirect: '/dashboard' },
     { path: '/login', component: LoginView, meta: { guest: true } },
+    { path: '/accept-invite', component: AcceptInviteView, meta: { guest: true } },
     { path: '/dashboard', component: DashboardView, meta: { requiresAuth: true } },
     {
       path: '/admin/accounts',
@@ -36,6 +40,16 @@ const router = createRouter({
       path: '/company/departments',
       component: DepartmentsView,
       meta: { requiresAuth: true, permission: 'department.read' },
+    },
+    {
+      path: '/company/employees',
+      component: EmployeesView,
+      meta: { requiresAuth: true, permission: 'employee.read' },
+    },
+    {
+      path: '/profile',
+      component: MyProfileView,
+      meta: { requiresAuth: true, permission: 'employee.self_update' },
     },
     {
       path: '/company/roles',

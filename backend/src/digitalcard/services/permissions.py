@@ -23,6 +23,13 @@ class Permission(StrEnum):
     AUDIT_READ = "audit.read"
     CONTENT_MANAGE = "content.manage"
     CUSTOMER_MANAGE = "customer.manage"
+    EMPLOYEE_READ = "employee.read"
+    EMPLOYEE_CREATE = "employee.create"
+    EMPLOYEE_UPDATE = "employee.update"
+    EMPLOYEE_STATUS = "employee.status"
+    EMPLOYEE_IMPORT = "employee.import"
+    EMPLOYEE_INVITE = "employee.invite"
+    EMPLOYEE_SELF_UPDATE = "employee.self_update"
 
 
 PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
@@ -38,6 +45,13 @@ PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
     Permission.AUDIT_READ.value: ("查看变更审计", "审计"),
     Permission.CONTENT_MANAGE.value: ("管理企业内容", "业务"),
     Permission.CUSTOMER_MANAGE.value: ("管理客户与跟进", "业务"),
+    Permission.EMPLOYEE_READ.value: ("查看员工档案", "员工"),
+    Permission.EMPLOYEE_CREATE.value: ("创建员工", "员工"),
+    Permission.EMPLOYEE_UPDATE.value: ("编辑员工", "员工"),
+    Permission.EMPLOYEE_STATUS.value: ("停用或恢复员工", "员工"),
+    Permission.EMPLOYEE_IMPORT.value: ("批量导入员工", "员工"),
+    Permission.EMPLOYEE_INVITE.value: ("邀请员工开通账户", "员工"),
+    Permission.EMPLOYEE_SELF_UPDATE.value: ("维护个人资料", "员工"),
 }
 
 ROLE_DEFINITIONS: dict[UserRole, tuple[str, str]] = {
@@ -53,15 +67,21 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.COMPANY_READ.value,
         Permission.DEPARTMENT_READ.value,
         Permission.CONTENT_MANAGE.value,
+        Permission.EMPLOYEE_READ.value,
+        Permission.EMPLOYEE_SELF_UPDATE.value,
     },
     UserRole.SALES: {
         Permission.COMPANY_READ.value,
         Permission.DEPARTMENT_READ.value,
         Permission.CUSTOMER_MANAGE.value,
+        Permission.EMPLOYEE_READ.value,
+        Permission.EMPLOYEE_SELF_UPDATE.value,
     },
     UserRole.EMPLOYEE: {
         Permission.COMPANY_READ.value,
         Permission.DEPARTMENT_READ.value,
+        Permission.EMPLOYEE_READ.value,
+        Permission.EMPLOYEE_SELF_UPDATE.value,
     },
 }
 

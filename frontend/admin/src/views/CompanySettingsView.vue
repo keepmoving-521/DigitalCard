@@ -9,7 +9,8 @@ const saving = ref(false)
 const message = ref('')
 const errorMessage = ref('')
 const canEdit = () => authState.user?.permissions.includes('company.update') ?? false
-const form = reactive({ name: '', logo_url: '', description: '', contact_name: '', contact_email: '', contact_phone: '', address: '' })
+const form = reactive({ name: '', logo_url: '', description: '', contact_name: '', contact_email: '', contact_phone: '', address: '', inactive_employee_visibility: 'hidden', employee_self_editable_fields: [] as string[] })
+const selfFields = [{ code: 'avatar_url', name: '头像' }, { code: 'phone', name: '手机号' }, { code: 'email', name: '邮箱' }, { code: 'bio', name: '个人简介' }]
 const code = ref('')
 
 async function loadCompany() {
@@ -20,6 +21,8 @@ async function loadCompany() {
       name: company.name, logo_url: company.logo_url ?? '', description: company.description ?? '',
       contact_name: company.contact_name ?? '', contact_email: company.contact_email ?? '',
       contact_phone: company.contact_phone ?? '', address: company.address ?? '',
+      inactive_employee_visibility: company.inactive_employee_visibility,
+      employee_self_editable_fields: [...company.employee_self_editable_fields],
     })
   } catch (error) { errorMessage.value = error instanceof ApiError ? error.message : '企业资料加载失败' }
   finally { loading.value = false }
@@ -53,9 +56,10 @@ onMounted(loadCompany)
       <label><span>联系邮箱</span><input v-model.trim="form.contact_email" :disabled="!canEdit()" type="email" /></label>
       <label><span>联系电话</span><input v-model.trim="form.contact_phone" :disabled="!canEdit()" /></label>
       <label><span>企业地址</span><input v-model.trim="form.address" :disabled="!canEdit()" /></label>
+      <label><span>离职员工公开展示</span><select v-model="form.inactive_employee_visibility" :disabled="!canEdit()"><option value="hidden">隐藏公开资料</option><option value="show_inactive">显示并标记离职</option></select></label>
+      <fieldset class="full-row policy-fields"><legend>员工可自行维护的字段</legend><label v-for="field in selfFields" :key="field.code"><input v-model="form.employee_self_editable_fields" type="checkbox" :value="field.code" :disabled="!canEdit()" />{{ field.name }}</label></fieldset>
       <button v-if="canEdit()" class="primary-button" type="submit" :disabled="saving">{{ saving ? '正在保存…' : '保存资料' }}</button>
       <p v-else class="password-rules">当前角色只有查看权限。</p>
     </form>
   </AppShell>
 </template>
-

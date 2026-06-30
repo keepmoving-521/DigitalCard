@@ -32,6 +32,9 @@ async function signOut() {
         <RouterLink v-if="hasPermission('department.read')" class="nav-item" to="/company/departments">
           部门管理
         </RouterLink>
+        <RouterLink v-if="hasPermission('employee.read')" class="nav-item" to="/company/employees">
+          员工管理
+        </RouterLink>
         <RouterLink v-if="hasPermission('role.read')" class="nav-item" to="/company/roles">
           角色权限
         </RouterLink>
@@ -39,13 +42,14 @@ async function signOut() {
           变更审计
         </RouterLink>
         <RouterLink class="nav-item" to="/change-password">修改密码</RouterLink>
+        <RouterLink v-if="hasPermission('employee.self_update')" class="nav-item" to="/profile">我的资料</RouterLink>
       </nav>
       <div class="sidebar-user">
         <span class="avatar">{{ authState.user?.display_name.slice(0, 1) }}</span>
         <div><b>{{ authState.user?.display_name }}</b><small>{{ authState.user?.email }}</small></div>
       </div>
       <button class="text-button" type="button" @click="signOut">安全退出</button>
-      <span class="version">V0.3.0 · 企业与权限</span>
+      <span class="version">V0.4.0 · 员工管理</span>
     </aside>
     <main class="page-content"><slot /></main>
   </div>
