@@ -8,6 +8,8 @@ from digitalcard.core.config import Settings, get_settings
 from digitalcard.core.errors import AppError
 from digitalcard.db.session import get_db
 from digitalcard.models.account import RefreshSession, User, UserRole
+from digitalcard.models.organization import Company, CompanyStatus
+from digitalcard.services.permissions import Permission, permissions_for_user
 from digitalcard.services.tokens import decode_access_token
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -26,6 +28,10 @@ def get_current_user(
         raise AppError("invalid_token", "Access token is invalid", 401)
     if not user.is_active:
         raise AppError("account_disabled", "Account is disabled", 403)
+    if user.company_id is not None:
+        company = db.get(Company, user.company_id)
+        if company is None or company.status != CompanyStatus.ACTIVE.value:
+            raise AppError("company_suspended", "Company workspace is suspended", 403)
     if payload["ver"] != user.token_version:
         raise AppError("token_revoked", "Access token has been revoked", 401)
     refresh_session = db.get(RefreshSession, payload["sid"])
@@ -38,11 +44,31 @@ def get_current_user(
     return user
 
 
-def require_admin(user: Annotated[User, Depends(get_current_user)]) -> User:
-    if user.role != UserRole.ADMIN.value:
-        raise AppError("permission_denied", "Administrator permission is required", 403)
+def require_platform_admin(user: Annotated[User, Depends(get_current_user)]) -> User:
+    if user.role != UserRole.PLATFORM_ADMIN.value:
+        raise AppError("permission_denied", "Platform administrator permission is required", 403)
     return user
 
 
+def require_tenant_user(user: Annotated[User, Depends(get_current_user)]) -> User:
+    if user.company_id is None or user.role == UserRole.PLATFORM_ADMIN.value:
+        raise AppError("tenant_required", "A company workspace is required", 403)
+    return user
+
+
+def require_permission(permission: Permission):
+    def dependency(
+        user: Annotated[User, Depends(require_tenant_user)],
+        db: Annotated[Session, Depends(get_db)],
+    ) -> User:
+        if permission.value not in permissions_for_user(db, user):
+            raise AppError("permission_denied", "Permission is required", 403)
+        return user
+
+    return dependency
+
+
 CurrentUser = Annotated[User, Depends(get_current_user)]
-AdminUser = Annotated[User, Depends(require_admin)]
+TenantUser = Annotated[User, Depends(require_tenant_user)]
+PlatformAdmin = Annotated[User, Depends(require_platform_admin)]
+AdminUser = PlatformAdmin

@@ -29,6 +29,8 @@ class UserResponse(BaseModel):
     email: str
     display_name: str
     role: UserRole
+    company_id: str | None
+    department_id: str | None
     is_active: bool
     must_change_password: bool
     last_login_at: datetime | None
@@ -36,11 +38,15 @@ class UserResponse(BaseModel):
     updated_at: datetime
 
 
+class CurrentUserResponse(UserResponse):
+    permissions: list[str]
+
+
 class SessionResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     expires_in: int
-    user: UserResponse
+    user: CurrentUserResponse
 
 
 class PasswordChangeRequest(BaseModel):
@@ -52,7 +58,9 @@ class UserCreateRequest(BaseModel):
     email: str
     display_name: str = Field(min_length=1, max_length=100)
     password: str = Field(min_length=12, max_length=256)
-    role: UserRole = UserRole.USER
+    role: UserRole = UserRole.EMPLOYEE
+    company_id: str | None = None
+    department_id: str | None = None
     must_change_password: bool = True
 
     _normalize_email = field_validator("email")(normalize_email)

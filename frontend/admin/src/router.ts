@@ -1,10 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { authState, initializeAuth } from './auth'
+import { authState, initializeAuth, logout, syncCurrentUser } from './auth'
 import AccountsView from './views/AccountsView.vue'
 import ChangePasswordView from './views/ChangePasswordView.vue'
 import DashboardView from './views/DashboardView.vue'
 import ForbiddenView from './views/ForbiddenView.vue'
 import LoginView from './views/LoginView.vue'
+import AuditsView from './views/AuditsView.vue'
+import CompaniesView from './views/CompaniesView.vue'
+import CompanySettingsView from './views/CompanySettingsView.vue'
+import DepartmentsView from './views/DepartmentsView.vue'
+import RolesView from './views/RolesView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -15,7 +20,32 @@ const router = createRouter({
     {
       path: '/admin/accounts',
       component: AccountsView,
-      meta: { requiresAuth: true, role: 'admin' },
+      meta: { requiresAuth: true, platform: true },
+    },
+    {
+      path: '/platform/companies',
+      component: CompaniesView,
+      meta: { requiresAuth: true, platform: true },
+    },
+    {
+      path: '/company/settings',
+      component: CompanySettingsView,
+      meta: { requiresAuth: true, permission: 'company.read' },
+    },
+    {
+      path: '/company/departments',
+      component: DepartmentsView,
+      meta: { requiresAuth: true, permission: 'department.read' },
+    },
+    {
+      path: '/company/roles',
+      component: RolesView,
+      meta: { requiresAuth: true, permission: 'role.read' },
+    },
+    {
+      path: '/company/audits',
+      component: AuditsView,
+      meta: { requiresAuth: true, permission: 'audit.read' },
     },
     { path: '/change-password', component: ChangePasswordView, meta: { requiresAuth: true } },
     { path: '/forbidden', component: ForbiddenView, meta: { requiresAuth: true } },
@@ -25,6 +55,14 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   await initializeAuth()
+  if (authState.user) {
+    try {
+      await syncCurrentUser()
+    } catch {
+      await logout()
+      return { path: '/login', query: { redirect: to.fullPath } }
+    }
+  }
   if (to.meta.requiresAuth && !authState.user) {
     return { path: '/login', query: { redirect: to.fullPath } }
   }
@@ -32,9 +70,14 @@ router.beforeEach(async (to) => {
   if (authState.user?.must_change_password && to.path !== '/change-password') {
     return '/change-password'
   }
-  if (to.meta.role && authState.user?.role !== to.meta.role) return '/forbidden'
+  if (to.meta.platform && authState.user?.role !== 'platform_admin') return '/forbidden'
+  if (
+    typeof to.meta.permission === 'string' &&
+    !authState.user?.permissions.includes(to.meta.permission)
+  ) {
+    return '/forbidden'
+  }
   return true
 })
 
 export default router
-

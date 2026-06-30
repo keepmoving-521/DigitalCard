@@ -1,12 +1,20 @@
 import { reactive } from 'vue'
 
-export type UserRole = 'admin' | 'user'
+export type UserRole =
+  | 'platform_admin'
+  | 'company_admin'
+  | 'content_admin'
+  | 'sales'
+  | 'employee'
 
 export interface User {
   id: string
   email: string
   display_name: string
   role: UserRole
+  company_id: string | null
+  department_id: string | null
+  permissions: string[]
   is_active: boolean
   must_change_password: boolean
   last_login_at: string | null
@@ -137,3 +145,8 @@ export async function apiRequest<T>(
   }
 }
 
+export async function syncCurrentUser(): Promise<User> {
+  const user = await apiRequest<User>('/auth/me')
+  authState.user = user
+  return user
+}

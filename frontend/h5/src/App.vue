@@ -3,7 +3,7 @@
     <section class="hero">
       <div class="topline">
         <span class="logo">DC</span>
-        <span class="badge">V0.1.0</span>
+        <span class="badge">V0.3.0</span>
       </div>
       <div class="copy">
         <p>DIGITAL BUSINESS CARD</p>
@@ -24,4 +24,3 @@
     </section>
   </main>
 </template>
-

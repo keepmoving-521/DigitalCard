@@ -11,7 +11,9 @@ from digitalcard.core.errors import AppError
 from digitalcard.core.time import utc_now
 from digitalcard.db.session import get_db
 from digitalcard.models.account import LoginAudit, RefreshSession, User
+from digitalcard.models.organization import Company, CompanyStatus
 from digitalcard.schemas.account import (
+    CurrentUserResponse,
     LoginRequest,
     PasswordChangeRequest,
     SessionResponse,
@@ -23,6 +25,7 @@ from digitalcard.services.passwords import (
     validate_password,
     verify_password,
 )
+from digitalcard.services.permissions import permissions_for_user
 from digitalcard.services.tokens import (
     create_access_token,
     create_refresh_session,
@@ -84,12 +87,16 @@ def clear_refresh_cookie(response: Response, settings: Settings) -> None:
 
 
 def session_response(
-    user: User, refresh_session: RefreshSession, settings: Settings
+    db: Session, user: User, refresh_session: RefreshSession, settings: Settings
 ) -> SessionResponse:
+    current_user = CurrentUserResponse(
+        **UserResponse.model_validate(user).model_dump(),
+        permissions=sorted(permissions_for_user(db, user)),
+    )
     return SessionResponse(
         access_token=create_access_token(user, settings, refresh_session.id),
         expires_in=settings.access_token_minutes * 60,
-        user=UserResponse.model_validate(user),
+        user=current_user,
     )
 
 
@@ -153,6 +160,12 @@ def login(
 
     if updated_hash:
         user.password_hash = updated_hash
+    if user.company_id is not None:
+        company = db.get(Company, user.company_id)
+        if company is None or company.status != CompanyStatus.ACTIVE.value:
+            add_login_audit(db, request, payload.email, False, "company_suspended", user.id)
+            db.commit()
+            raise AppError("company_suspended", "Company workspace is suspended", 403)
     user.failed_login_attempts = 0
     user.locked_until = None
     user.last_login_at = now
@@ -164,7 +177,7 @@ def login(
     db.commit()
     db.refresh(user)
     set_refresh_cookie(response, refresh_token, settings)
-    return session_response(user, refresh_session, settings)
+    return session_response(db, user, refresh_session, settings)
 
 
 @router.post("/refresh", response_model=SessionResponse, summary="Refresh session")
@@ -182,7 +195,7 @@ def refresh(
         db, refresh_token, settings, ip_address, user_agent
     )
     set_refresh_cookie(response, new_refresh_token, settings)
-    return session_response(user, refresh_session, settings)
+    return session_response(db, user, refresh_session, settings)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT, summary="Sign out")
@@ -198,9 +211,12 @@ def logout(
     clear_refresh_cookie(response, settings)
 
 
-@router.get("/me", response_model=UserResponse, summary="Get current user")
-def me(user: CurrentUser) -> User:
-    return user
+@router.get("/me", response_model=CurrentUserResponse, summary="Get current user")
+def me(user: CurrentUser, db: Annotated[Session, Depends(get_db)]) -> CurrentUserResponse:
+    return CurrentUserResponse(
+        **UserResponse.model_validate(user).model_dump(),
+        permissions=sorted(permissions_for_user(db, user)),
+    )
 
 
 @router.put("/me/password", status_code=status.HTTP_204_NO_CONTENT, summary="Change password")

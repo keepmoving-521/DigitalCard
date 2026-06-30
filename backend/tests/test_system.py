@@ -18,7 +18,7 @@ async def test_health_check() -> None:
     assert response.json() == {
         "status": "ok",
         "service": "DigitalCard API",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "environment": "test",
     }
     assert response.headers["X-Request-ID"]
@@ -33,7 +33,7 @@ async def test_readiness_check() -> None:
 async def test_openapi_document_is_available() -> None:
     response = await request("/openapi.json")
     assert response.status_code == 200
-    assert response.json()["info"]["version"] == "0.2.0"
+    assert response.json()["info"]["version"] == "0.3.0"
 
 
 async def test_not_found_uses_unified_error_shape() -> None:

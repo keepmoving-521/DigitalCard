@@ -13,6 +13,7 @@ from digitalcard.core.config import Settings
 from digitalcard.core.errors import AppError
 from digitalcard.core.time import utc_now
 from digitalcard.models.account import RefreshSession, User
+from digitalcard.models.organization import Company, CompanyStatus
 
 
 def create_access_token(
@@ -138,6 +139,12 @@ def rotate_refresh_session(
         session.revoked_at = utc_now()
         db.commit()
         raise AppError("account_disabled", "Account is disabled", 403)
+    if user.company_id is not None:
+        company = db.get(Company, user.company_id)
+        if company is None or company.status != CompanyStatus.ACTIVE.value:
+            session.revoked_at = utc_now()
+            db.commit()
+            raise AppError("company_suspended", "Company workspace is suspended", 403)
 
     new_raw_token, new_session = create_refresh_session(db, user, settings, ip_address, user_agent)
     session.revoked_at = utc_now()

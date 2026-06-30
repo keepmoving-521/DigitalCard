@@ -28,7 +28,7 @@ def create_admin(email: str, display_name: str) -> None:
             email=normalized_email,
             display_name=display_name.strip(),
             password_hash=hash_password(password),
-            role=UserRole.ADMIN.value,
+            role=UserRole.PLATFORM_ADMIN.value,
             must_change_password=False,
         )
         db.add(user)

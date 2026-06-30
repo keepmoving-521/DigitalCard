@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session
 from digitalcard.api.dependencies import AdminUser
 from digitalcard.core.errors import AppError
 from digitalcard.db.session import get_db
-from digitalcard.models.account import LoginAudit, User
+from digitalcard.models.account import LoginAudit, User, UserRole
+from digitalcard.models.organization import Company, CompanyStatus, Department, TenantRole
 from digitalcard.schemas.account import (
     LoginAuditResponse,
     PasswordResetRequest,
@@ -46,12 +47,43 @@ def create_user(
 ) -> User:
     if db.scalar(select(func.count()).select_from(User).where(User.email == payload.email)):
         raise AppError("email_exists", "An account with this email already exists", 409)
+    if payload.role == UserRole.PLATFORM_ADMIN:
+        if payload.company_id is not None or payload.department_id is not None:
+            raise AppError(
+                "invalid_platform_account", "Platform accounts cannot belong to a company", 422
+            )
+    else:
+        if payload.company_id is None:
+            raise AppError("company_required", "Company is required for tenant accounts", 422)
+        company = db.get(Company, payload.company_id)
+        if company is None:
+            raise AppError("company_not_found", "Company was not found", 404)
+        if company.status != CompanyStatus.ACTIVE.value:
+            raise AppError("company_suspended", "Company workspace is suspended", 409)
+        if not db.scalar(
+            select(TenantRole.id).where(
+                TenantRole.company_id == company.id,
+                TenantRole.code == payload.role.value,
+            )
+        ):
+            raise AppError("invalid_tenant_role", "Role is not available in this company", 422)
+        if payload.department_id:
+            department = db.scalar(
+                select(Department).where(
+                    Department.id == payload.department_id,
+                    Department.company_id == company.id,
+                )
+            )
+            if department is None:
+                raise AppError("department_not_found", "Department was not found", 404)
     validate_password(payload.password, payload.email)
     user = User(
         email=payload.email,
         display_name=payload.display_name,
         password_hash=hash_password(payload.password),
         role=payload.role.value,
+        company_id=payload.company_id,
+        department_id=payload.department_id,
         must_change_password=payload.must_change_password,
     )
     db.add(user)

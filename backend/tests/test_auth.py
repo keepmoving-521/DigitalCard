@@ -152,6 +152,13 @@ async def test_failed_logins_lock_account_and_are_audited(client: AsyncClient) -
 async def test_admin_can_create_disable_and_reset_user(client: AsyncClient) -> None:
     create_user(ADMIN_EMAIL, ADMIN_PASSWORD, UserRole.ADMIN)
     admin_session = await login(client, ADMIN_EMAIL, ADMIN_PASSWORD)
+    company_response = await client.post(
+        "/api/v1/platform/companies",
+        headers=authorization(admin_session),
+        json={"code": "auth-test", "name": "Auth Test Company"},
+    )
+    assert company_response.status_code == 201
+    company_id = company_response.json()["id"]
     response = await client.post(
         "/api/v1/admin/users",
         headers=authorization(admin_session),
@@ -159,7 +166,8 @@ async def test_admin_can_create_disable_and_reset_user(client: AsyncClient) -> N
             "email": USER_EMAIL,
             "display_name": "New User",
             "password": USER_PASSWORD,
-            "role": "user",
+            "role": "employee",
+            "company_id": company_id,
         },
     )
     assert response.status_code == 201

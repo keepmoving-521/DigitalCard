@@ -10,8 +10,15 @@ from digitalcard.db.base import Base
 
 
 class UserRole(StrEnum):
-    ADMIN = "admin"
-    USER = "user"
+    PLATFORM_ADMIN = "platform_admin"
+    COMPANY_ADMIN = "company_admin"
+    CONTENT_ADMIN = "content_admin"
+    SALES = "sales"
+    EMPLOYEE = "employee"
+
+    # Backward-compatible aliases for code written before V0.3.0.
+    ADMIN = "platform_admin"
+    USER = "employee"
 
 
 class User(Base):
@@ -21,7 +28,13 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
     display_name: Mapped[str] = mapped_column(String(100))
     password_hash: Mapped[str] = mapped_column(String(512))
-    role: Mapped[str] = mapped_column(String(32), default=UserRole.USER.value, index=True)
+    role: Mapped[str] = mapped_column(String(32), default=UserRole.EMPLOYEE.value, index=True)
+    company_id: Mapped[str | None] = mapped_column(
+        ForeignKey("companies.id", ondelete="RESTRICT"), nullable=True, index=True
+    )
+    department_id: Mapped[str | None] = mapped_column(
+        ForeignKey("departments.id", ondelete="SET NULL"), nullable=True, index=True
+    )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
     must_change_password: Mapped[bool] = mapped_column(Boolean, default=False)
     failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0)
