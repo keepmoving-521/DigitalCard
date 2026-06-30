@@ -73,3 +73,35 @@ class DigitalCard(Base):
     offline_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, onupdate=utc_now)
+
+
+class CardEventType(StrEnum):
+    VIEW = "view"
+    CALL = "call"
+    EMAIL = "email"
+    WECHAT_COPY = "wechat_copy"
+    VCARD_DOWNLOAD = "vcard_download"
+    SHARE_COPY = "share_copy"
+    QR_OPEN = "qr_open"
+
+
+class CardEvent(Base):
+    __tablename__ = "card_events"
+    __table_args__ = (
+        UniqueConstraint("dedupe_key", name="uq_card_events_dedupe_key"),
+        Index("ix_card_events_card_occurred", "card_id", "occurred_at"),
+        Index("ix_card_events_company_occurred", "company_id", "occurred_at"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid4()))
+    card_id: Mapped[str] = mapped_column(
+        ForeignKey("digital_cards.id", ondelete="CASCADE"), index=True
+    )
+    company_id: Mapped[str] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), index=True
+    )
+    event_type: Mapped[str] = mapped_column(String(32), index=True)
+    source: Mapped[str] = mapped_column(String(64), default="direct", index=True)
+    visitor_hash: Mapped[str] = mapped_column(String(64), index=True)
+    dedupe_key: Mapped[str] = mapped_column(String(64), unique=True)
+    occurred_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now, index=True)

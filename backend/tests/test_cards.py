@@ -91,6 +91,45 @@ async def test_draft_changes_do_not_change_published_snapshot(client: AsyncClien
     assert preview.json()["data"]["headline"] == "尚未发布的第二版"
 
 
+async def test_public_fields_qr_and_event_deduplication(client: AsyncClient) -> None:
+    _, _, _, owner_session, _ = await setup_employee(client)
+    await client.patch(
+        "/api/v1/tenant/cards/me",
+        headers=headers(owner_session),
+        json={"visible_fields": ["headline"], "headline": "仅公开职位"},
+    )
+    published = await client.post("/api/v1/tenant/cards/me/publish", headers=headers(owner_session))
+    card_id = published.json()["id"]
+    public = await client.get(f"/api/v1/public/cards/{card_id}?source=wechat")
+    assert public.status_code == 200
+    assert public.json()["data"]["headline"] == "仅公开职位"
+    assert "email" not in public.json()["data"]
+    assert public.json()["share_url"].endswith(f"/{card_id}?source=wechat")
+
+    qr = await client.get(f"/api/v1/public/cards/{card_id}/qr.svg?source=poster")
+    assert qr.status_code == 200
+    assert qr.headers["content-type"].startswith("image/svg+xml")
+    assert qr.headers["x-qr-content"].endswith(f"/{card_id}?source=poster")
+    assert "<svg" in qr.text and "<path" in qr.text
+
+    event = {"event_type": "view", "visitor_id": "visitor-00000001", "source": "wechat"}
+    first = await client.post(f"/api/v1/public/cards/{card_id}/events", json=event)
+    duplicate = await client.post(f"/api/v1/public/cards/{card_id}/events", json=event)
+    assert first.status_code == 201 and first.json()["recorded"] is True
+    assert duplicate.status_code == 200 and duplicate.json()["recorded"] is False
+    action = await client.post(
+        f"/api/v1/public/cards/{card_id}/events",
+        json={"event_type": "call", "visitor_id": "visitor-00000001", "source": "wechat"},
+    )
+    assert action.status_code == 201
+    analytics = await client.get(
+        "/api/v1/tenant/cards/me/analytics", headers=headers(owner_session)
+    )
+    assert analytics.json()["total_views"] == 1
+    assert analytics.json()["total_actions"] == 1
+    assert analytics.json()["by_source"] == {"wechat": 2}
+
+
 async def test_template_lock_and_cross_employee_permissions(client: AsyncClient) -> None:
     platform, company, admin_session, owner_session, owner = await setup_employee(client)
     template = await client.put(
@@ -179,10 +218,42 @@ async def test_publish_validation_offline_and_republish(client: AsyncClient) -> 
     card_id = published.json()["id"]
     offline = await client.post("/api/v1/tenant/cards/me/offline", headers=headers(owner_session))
     assert offline.json()["status"] == "offline"
-    assert (await client.get(f"/api/v1/public/cards/{card_id}")).status_code == 404
+    offline_public = await client.get(f"/api/v1/public/cards/{card_id}")
+    assert offline_public.status_code == 410
+    assert offline_public.json()["error"]["code"] == "card_offline"
 
     republished = await client.post(
         "/api/v1/tenant/cards/me/publish", headers=headers(owner_session)
     )
     assert republished.json()["status"] == "published"
     assert (await client.get(f"/api/v1/public/cards/{card_id}")).status_code == 200
+
+
+async def test_employee_and_company_status_make_public_card_unavailable(
+    client: AsyncClient,
+) -> None:
+    platform, company, admin_session, owner_session, employee = await setup_employee(client)
+    published = await client.post("/api/v1/tenant/cards/me/publish", headers=headers(owner_session))
+    card_id = published.json()["id"]
+    await client.post(
+        f"/api/v1/tenant/employees/{employee['id']}/status",
+        headers=headers(admin_session),
+        json={"status": "inactive"},
+    )
+    unavailable = await client.get(f"/api/v1/public/cards/{card_id}")
+    assert unavailable.status_code == 410
+    assert unavailable.json()["error"]["code"] == "employee_inactive"
+
+    await client.post(
+        f"/api/v1/tenant/employees/{employee['id']}/status",
+        headers=headers(admin_session),
+        json={"status": "active"},
+    )
+    await client.patch(
+        f"/api/v1/platform/companies/{company['id']}/status",
+        headers=headers(platform),
+        json={"status": "suspended"},
+    )
+    unavailable = await client.get(f"/api/v1/public/cards/{card_id}")
+    assert unavailable.status_code == 410
+    assert unavailable.json()["error"]["code"] == "company_suspended"

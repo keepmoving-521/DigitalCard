@@ -48,7 +48,7 @@ async function submit() {
         <h1>让每一次客户连接，<br />都有迹可循。</h1>
         <p>统一管理企业名片、内容与客户关系。</p>
       </div>
-      <span class="story-version">V0.5.0 · Digital Cards</span>
+      <span class="story-version">V0.6.0 · H5 Sharing</span>
     </section>
     <section class="login-panel">
       <form class="login-form" @submit.prevent="submit">

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     refresh_cookie_name: str = "digitalcard_refresh"
     invite_base_url: str = "http://localhost:5173/accept-invite"
     invite_expire_hours: int = Field(default=72, ge=1, le=168)
+    public_card_base_url: str = "http://localhost:5174/card"
 
     @property
     def cors_origins_list(self) -> list[str]:

@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from digitalcard.models.card import CardStatus
+from digitalcard.models.card import CardEventType, CardStatus
 
 MODULES = {"profile", "contact", "social", "bio"}
 PERSONALIZATION_FIELDS = {"theme_color", "logo_url", "module_order"}
@@ -17,6 +17,7 @@ CONTENT_FIELDS = {
     "wechat",
     "website",
     "socials",
+    "visible_fields",
     *PERSONALIZATION_FIELDS,
 }
 
@@ -108,6 +109,7 @@ class CardDraftUpdateRequest(BaseModel):
     theme_color: str | None = None
     logo_url: str | None = Field(default=None, max_length=1024)
     module_order: list[str] | None = None
+    visible_fields: list[str] | None = None
 
     _avatar = field_validator("avatar_url")(validate_http_url)
     _website = field_validator("website")(validate_http_url)
@@ -122,6 +124,23 @@ class CardDraftUpdateRequest(BaseModel):
     @classmethod
     def validate_optional_modules(cls, value: list[str] | None) -> list[str] | None:
         return validate_modules(value) if value is not None else None
+
+    @field_validator("visible_fields")
+    @classmethod
+    def validate_visible_fields(cls, value: list[str] | None) -> list[str] | None:
+        allowed = {
+            "headline",
+            "avatar_url",
+            "bio",
+            "phone",
+            "email",
+            "wechat",
+            "website",
+            "socials",
+        }
+        if value is not None and (len(value) != len(set(value)) or not set(value) <= allowed):
+            raise ValueError("Visible fields contain unsupported values")
+        return value
 
 
 class DigitalCardResponse(BaseModel):
@@ -152,3 +171,28 @@ class PublicCardResponse(BaseModel):
     employee_id: str
     data: dict[str, object]
     published_at: datetime
+    share_url: str
+
+
+class CardEventRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    event_type: CardEventType
+    visitor_id: str = Field(min_length=8, max_length=128)
+    source: str = Field(default="direct", min_length=1, max_length=64)
+
+    @field_validator("source")
+    @classmethod
+    def normalize_source(cls, value: str) -> str:
+        source = re.sub(r"[^a-zA-Z0-9_-]", "", value.strip().lower())
+        return source[:64] or "direct"
+
+
+class CardEventResponse(BaseModel):
+    recorded: bool
+
+
+class CardAnalyticsResponse(BaseModel):
+    total_views: int
+    total_actions: int
+    by_event: dict[str, int]
+    by_source: dict[str, int]

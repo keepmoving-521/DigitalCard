@@ -2,7 +2,7 @@ from copy import deepcopy
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from digitalcard.api.dependencies import require_permission
@@ -10,10 +10,17 @@ from digitalcard.core.errors import AppError
 from digitalcard.core.time import utc_now
 from digitalcard.db.session import get_db
 from digitalcard.models.account import User
-from digitalcard.models.card import CardStatus, CardTemplate, DigitalCard
+from digitalcard.models.card import (
+    CardEvent,
+    CardEventType,
+    CardStatus,
+    CardTemplate,
+    DigitalCard,
+)
 from digitalcard.models.employee import Employee, EmployeeStatus
 from digitalcard.models.organization import Company
 from digitalcard.schemas.card import (
+    CardAnalyticsResponse,
     CardDraftUpdateRequest,
     CardPreviewResponse,
     CardTemplateResponse,
@@ -24,6 +31,7 @@ from digitalcard.services.cards import (
     card_response,
     get_or_create_card,
     get_or_create_template,
+    public_snapshot,
     resolve_card_data,
     validate_publishable,
 )
@@ -69,7 +77,7 @@ def update_card_draft(
     changes = payload.model_dump(exclude_unset=True, mode="json")
     denied = set(changes) & set(template.locked_fields)
     if employee_edit:
-        denied.update(set(changes) - set(template.employee_editable_fields))
+        denied.update(set(changes) - set(template.employee_editable_fields) - {"visible_fields"})
     if denied:
         raise AppError(
             "card_field_locked",
@@ -117,7 +125,7 @@ def publish_card(db: Session, employee: Employee, actor: User) -> DigitalCard:
     card = get_or_create_card(db, employee)
     resolved = resolve_card_data(company, template, card.draft_data)
     validate_publishable(resolved)
-    card.published_data = deepcopy(resolved)
+    card.published_data = deepcopy(public_snapshot(resolved))
     card.published_revision = card.draft_revision
     card.status = CardStatus.PUBLISHED.value
     card.published_at = utc_now()
@@ -154,6 +162,34 @@ def offline_card(db: Session, employee: Employee, actor: User) -> DigitalCard:
     db.commit()
     db.refresh(card)
     return card
+
+
+def card_analytics(db: Session, employee: Employee) -> CardAnalyticsResponse:
+    card = get_or_create_card(db, employee)
+    db.commit()
+    by_event = {
+        event_type: count
+        for event_type, count in db.execute(
+            select(CardEvent.event_type, func.count())
+            .where(CardEvent.card_id == card.id)
+            .group_by(CardEvent.event_type)
+        )
+    }
+    by_source = {
+        source: count
+        for source, count in db.execute(
+            select(CardEvent.source, func.count())
+            .where(CardEvent.card_id == card.id)
+            .group_by(CardEvent.source)
+        )
+    }
+    views = by_event.get(CardEventType.VIEW.value, 0)
+    return CardAnalyticsResponse(
+        total_views=views,
+        total_actions=sum(by_event.values()) - views,
+        by_event=by_event,
+        by_source=by_source,
+    )
 
 
 @router.get("/card-template", response_model=CardTemplateResponse, summary="Get card template")
@@ -240,6 +276,29 @@ def offline_my_card(
     db: Annotated[Session, Depends(get_db)],
 ) -> dict[str, object]:
     return card_response(offline_card(db, employee_for_user(db, user), user))
+
+
+@router.get(
+    "/cards/me/analytics", response_model=CardAnalyticsResponse, summary="Get my card analytics"
+)
+def get_my_card_analytics(
+    user: Annotated[User, Depends(require_permission(Permission.CARD_READ))],
+    db: Annotated[Session, Depends(get_db)],
+) -> CardAnalyticsResponse:
+    return card_analytics(db, employee_for_user(db, user))
+
+
+@router.get(
+    "/cards/{employee_id}/analytics",
+    response_model=CardAnalyticsResponse,
+    summary="Get employee card analytics",
+)
+def get_employee_card_analytics(
+    employee_id: str,
+    user: Annotated[User, Depends(require_permission(Permission.CARD_MANAGE))],
+    db: Annotated[Session, Depends(get_db)],
+) -> CardAnalyticsResponse:
+    return card_analytics(db, tenant_employee(db, user.company_id, employee_id))
 
 
 @router.get("/cards/{employee_id}", response_model=DigitalCardResponse, summary="Get employee card")

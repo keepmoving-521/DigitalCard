@@ -27,6 +27,16 @@ def initial_draft(employee: Employee) -> dict[str, object]:
         "wechat": None,
         "website": None,
         "socials": [],
+        "visible_fields": [
+            "headline",
+            "avatar_url",
+            "bio",
+            "phone",
+            "email",
+            "wechat",
+            "website",
+            "socials",
+        ],
     }
 
 
@@ -102,3 +112,20 @@ def validate_publishable(data: dict[str, object]) -> None:
             422,
             {"missing": missing, "invalid_images": invalid_images},
         )
+
+
+def public_snapshot(data: dict[str, object]) -> dict[str, object]:
+    always_public = {
+        "company_name",
+        "display_name",
+        "theme_color",
+        "logo_url",
+        "module_order",
+        "template_revision",
+    }
+    selectable = set(data.get("visible_fields") or [])
+    return {
+        key: value
+        for key, value in data.items()
+        if key in always_public or (key in selectable and value is not None)
+    }

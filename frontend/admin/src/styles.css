@@ -144,6 +144,13 @@ td small { margin-top: 4px; color: #7c8780; }
 .form-actions { display: flex; align-items: center; gap: 12px; }
 .card-status-actions { display: flex; align-items: center; gap: 10px; }
 .draft-badge { padding: 6px 10px; border-radius: 100px; color: #805d20; background: #fff1ce; font-size: 11px; }
+.card-share-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; padding: 18px; border-radius: 14px; background: white; }
+.card-share-tools div { padding: 12px; border-radius: 10px; background: #f1f6f2; }
+.card-share-tools span, .card-share-tools b { display: block; }
+.card-share-tools span { color: #77837b; font-size: 10px; }
+.card-share-tools b { margin-top: 4px; font-size: 22px; }
+.card-share-tools img { width: 150px; grid-column: 1 / -1; justify-self: center; image-rendering: pixelated; }
+.card-share-tools .primary-button { grid-column: 1 / -1; width: 100%; }
 .link-button { padding: 0; border: 0; color: #246f48; background: transparent; }
 .link-button.danger { color: #ad4740; }
 .empty-state { padding: 60px; color: #78837c; text-align: center; }

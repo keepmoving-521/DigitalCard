@@ -53,7 +53,7 @@ async function signOut() {
         <div><b>{{ authState.user?.display_name }}</b><small>{{ authState.user?.email }}</small></div>
       </div>
       <button class="text-button" type="button" @click="signOut">安全退出</button>
-      <span class="version">V0.5.0 · 数字名片</span>
+      <span class="version">V0.6.0 · H5 分享</span>
     </aside>
     <main class="page-content"><slot /></main>
   </div>
