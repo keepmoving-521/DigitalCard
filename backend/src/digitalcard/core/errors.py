@@ -2,6 +2,7 @@ import logging
 from typing import Any
 
 from fastapi import FastAPI, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -10,10 +11,13 @@ logger = logging.getLogger(__name__)
 
 
 class AppError(Exception):
-    def __init__(self, code: str, message: str, status_code: int = 400) -> None:
+    def __init__(
+        self, code: str, message: str, status_code: int = 400, details: Any = None
+    ) -> None:
         self.code = code
         self.message = message
         self.status_code = status_code
+        self.details = details
         super().__init__(message)
 
 
@@ -33,7 +37,7 @@ def install_exception_handlers(app: FastAPI) -> None:
     async def handle_app_error(request: Request, exc: AppError) -> JSONResponse:
         return JSONResponse(
             status_code=exc.status_code,
-            content=error_body(request, exc.code, exc.message),
+            content=error_body(request, exc.code, exc.message, exc.details),
         )
 
     @app.exception_handler(RequestValidationError)
@@ -43,7 +47,10 @@ def install_exception_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=422,
             content=error_body(
-                request, "validation_error", "Request validation failed", exc.errors()
+                request,
+                "validation_error",
+                "Request validation failed",
+                jsonable_encoder(exc.errors()),
             ),
         )
 

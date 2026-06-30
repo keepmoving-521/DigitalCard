@@ -2,7 +2,7 @@
 
 > 面向企业的数字名片与客户经营平台，让名片成为品牌展示、客户连接和业务增长的数字入口。
 
-![Version](https://img.shields.io/badge/version-0.1.0-26734d.svg)
+![Version](https://img.shields.io/badge/version-0.2.0-26734d.svg)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776ab.svg)
 ![Node](https://img.shields.io/badge/Node.js-22+-339933.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)
@@ -11,7 +11,7 @@
 
 ## 当前版本
 
-V0.1.0 已完成工程底座，当前仓库包含：
+V0.2.0 已完成账户、登录与基础安全能力，当前仓库包含：
 
 - FastAPI 后端服务、统一错误响应、请求日志和请求 ID；
 - 应用存活检查、数据库就绪检查和自动 OpenAPI 文档；
@@ -20,8 +20,13 @@ V0.1.0 已完成工程底座，当前仓库包含：
 - Vue 3 + TypeScript 移动 H5 工程；
 - 后端接口测试、前端组件测试和代码检查；
 - 本地一键启动脚本、Docker Compose 和 GitHub Actions CI。
+- 邮箱密码登录、会话刷新、安全退出和当前账户查询；
+- Argon2 密码哈希、密码强度校验、失败锁定和登录审计；
+- 管理员创建、启停和重置账户密码；
+- 短期访问令牌、HttpOnly 刷新 Cookie、令牌轮换与即时撤销；
+- 管理端登录页、鉴权路由、强制改密、账户管理和无权限页面。
 
-当前版本仅提供基础工程和展示首页，不包含登录、企业、员工、名片等业务功能。后续范围见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
+当前版本不包含企业、部门、员工和名片业务。认证设计和 API 见 [账户与认证说明](docs/AUTHENTICATION.md)，后续范围见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
 
 ## 快速开始
 
@@ -63,6 +68,16 @@ V0.1.0 已完成工程底座，当前仓库包含：
 | 数据库就绪检查 | <http://localhost:8000/api/v1/ready> |
 
 按 `Ctrl+C` 可同时停止三个开发服务。
+
+### 创建首个管理员
+
+完成安装和数据库迁移后，执行以下命令并按提示输入密码：
+
+```powershell
+.\scripts\create-admin.ps1 --email admin@example.com --name "系统管理员"
+```
+
+密码输入不会显示在终端，也不会进入命令历史。创建完成后可从管理端登录，并在“账户管理”中创建其他账户。
 
 ### 分步启动
 
@@ -134,12 +149,15 @@ npm run dev -w @digitalcard/h5
 | --- | --- | --- | --- |
 | `APP_NAME` | 否 | `DigitalCard API` | 服务名称 |
 | `APP_ENV` | 否 | `development` | `development`、`test`、`staging` 或 `production` |
-| `APP_VERSION` | 否 | `0.1.0` | 对外版本号 |
 | `SECRET_KEY` | 是 | 无安全默认值 | 至少 32 个字符；生产环境必须使用随机密钥 |
 | `DATABASE_URL` | 否 | `sqlite:///./data/digitalcard.db` | SQLAlchemy 数据库连接地址 |
 | `LOG_LEVEL` | 否 | `INFO` | 日志级别 |
 | `CORS_ORIGINS` | 否 | 本地两个前端地址 | 逗号分隔的可信来源 |
 | `VITE_API_BASE_URL` | 否 | 本地 API 地址 | 前端构建时的 API 基础地址 |
+| `ACCESS_TOKEN_MINUTES` | 否 | `15` | 访问令牌有效分钟数，范围 5～60 |
+| `REFRESH_TOKEN_DAYS` | 否 | `7` | 刷新会话有效天数，范围 1～30 |
+| `LOGIN_MAX_ATTEMPTS` | 否 | `5` | 连续失败锁定阈值 |
+| `LOGIN_LOCK_MINUTES` | 否 | `15` | 账户临时锁定分钟数 |
 
 不同环境的参考模板位于 `deploy/env/`。应用在 `SECRET_KEY` 缺失、过短或生产环境仍使用示例密钥时会拒绝启动并给出配置错误。
 
@@ -228,6 +246,9 @@ DigitalCard/
 │   │   ├── core/                # 配置、日志与错误处理
 │   │   ├── db/                  # 数据库基础设施
 │   │   ├── middleware/          # HTTP 中间件
+│   │   ├── models/              # SQLAlchemy 业务模型
+│   │   ├── schemas/             # API 请求与响应模型
+│   │   ├── services/            # 密码与令牌服务
 │   │   └── main.py              # FastAPI 入口
 │   ├── tests/                   # 后端测试
 │   ├── alembic.ini
@@ -269,7 +290,7 @@ DigitalCard/
 ## 版本路线
 
 - [x] **V0.1.0：工程底座** — 后端、管理端、H5、迁移、测试、CI 与容器
-- [ ] **V0.2.0：账户与登录** — 账户管理、登录状态与基础安全
+- [x] **V0.2.0：账户与登录** — 账户管理、登录状态与基础安全
 - [ ] **V0.3.0：企业与权限** — 企业空间、组织架构、租户隔离与 RBAC
 - [ ] **V0.4.0～V1.0.0：数字名片 MVP** — 员工、名片、分享、产品、线索与 CRM
 - [ ] **V1.1.0～V1.5.0：经营平台** — 分析、营销、SaaS、AI 与开放平台

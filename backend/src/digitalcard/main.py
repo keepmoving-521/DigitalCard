@@ -23,7 +23,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(
         title=settings.app_name,
-        version=settings.app_version,
+        version=__version__,
         description="DigitalCard HTTP API",
         docs_url="/docs",
         redoc_url="/redoc",

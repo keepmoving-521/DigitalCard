@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
+$env:UV_CACHE_DIR = Join-Path $root ".cache\uv"
 
 if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
     throw "uv is required. Install it from https://docs.astral.sh/uv/"
@@ -16,4 +17,3 @@ uv sync
 npm install
 uv run alembic -c backend/alembic.ini upgrade head
 Write-Host "DigitalCard setup complete. Run .\scripts\dev.ps1 to start all services." -ForegroundColor Green
-

@@ -6,6 +6,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "strict": true,
+    "noEmit": true,
     "jsx": "preserve",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -16,4 +17,3 @@
   },
   "include": ["src/**/*.ts", "src/**/*.vue"]
 }
-

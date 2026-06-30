@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from digitalcard import __version__
 from digitalcard.core.config import Settings, get_settings
 from digitalcard.db.session import get_db
 
@@ -28,7 +29,7 @@ def health(settings: Annotated[Settings, Depends(get_settings)]) -> HealthRespon
     return HealthResponse(
         status="ok",
         service=settings.app_name,
-        version=settings.app_version,
+        version=__version__,
         environment=settings.app_env,
     )
 

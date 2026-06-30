@@ -1,6 +1,7 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
+$env:UV_CACHE_DIR = Join-Path $root ".cache\uv"
 
 if (-not (Test-Path ".env")) {
     Copy-Item ".env.example" ".env"
@@ -17,4 +18,3 @@ if (-not (Test-Path "node_modules")) {
 
 uv run alembic -c backend/alembic.ini upgrade head
 npm run dev
-
