@@ -1,0 +1,22 @@
+{
+  "name": "digitalcard",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "frontend/admin",
+    "frontend/h5"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,admin,h5 -c blue,green,magenta \"uv run uvicorn digitalcard.main:app --app-dir backend/src --reload --port 8000\" \"npm run dev -w @digitalcard/admin\" \"npm run dev -w @digitalcard/h5\"",
+    "build": "npm run build -w @digitalcard/admin && npm run build -w @digitalcard/h5",
+    "test": "npm run test -w @digitalcard/admin && npm run test -w @digitalcard/h5",
+    "typecheck": "npm run typecheck -w @digitalcard/admin && npm run typecheck -w @digitalcard/h5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  },
+  "engines": {
+    "node": ">=22.12",
+    "npm": ">=10"
+  }
+}

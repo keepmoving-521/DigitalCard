@@ -218,3 +218,15 @@ __marimo__/
 .streamlit/secrets.toml
 
 .idea/
+
+# Node / Vue / Vite
+node_modules/
+frontend/*/dist/
+*.tsbuildinfo
+
+# Local application data
+data/
+
+# Local reports and editor files
+reports/
+.DS_Store

@@ -2,194 +2,280 @@
 
 > 面向企业的数字名片与客户经营平台，让名片成为品牌展示、客户连接和业务增长的数字入口。
 
-![Project Status](https://img.shields.io/badge/status-planning-orange.svg)
+![Version](https://img.shields.io/badge/version-0.1.0-26734d.svg)
+![Python](https://img.shields.io/badge/Python-3.12+-3776ab.svg)
+![Node](https://img.shields.io/badge/Node.js-22+-339933.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)
+![Vue](https://img.shields.io/badge/Vue-3.5+-42b883.svg)
 ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
 
-## 项目简介
+## 当前版本
 
-DigitalCard 计划为企业提供统一的数字名片管理能力，并逐步连接企业展示、产品营销、客户关系管理、数据分析与 AI 服务。
+V0.1.0 已完成工程底座，当前仓库包含：
 
-平台以企业和员工为核心：企业可以统一品牌形象、组织与名片模板，员工可以通过 H5、二维码等方式分享个人名片，客户在浏览、咨询或留资后进入可持续跟进的业务流程。
+- FastAPI 后端服务、统一错误响应、请求日志和请求 ID；
+- 应用存活检查、数据库就绪检查和自动 OpenAPI 文档；
+- SQLAlchemy 数据库基础设施和 Alembic 迁移基线；
+- Vue 3 + TypeScript 管理端；
+- Vue 3 + TypeScript 移动 H5 工程；
+- 后端接口测试、前端组件测试和代码检查；
+- 本地一键启动脚本、Docker Compose 和 GitHub Actions CI。
 
-> [!IMPORTANT]
-> 当前仓库处于规划与初始化阶段，暂未包含可运行的前后端代码。本文中的功能与技术架构均为建设目标，不代表已经交付。
+当前版本仅提供基础工程和展示首页，不包含登录、企业、员工、名片等业务功能。后续范围见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
 
-## 产品定位
+## 快速开始
 
-DigitalCard 希望解决以下问题：
+### 环境要求
 
-- 企业名片样式分散，品牌信息难以统一维护；
-- 客户浏览、分享和留资数据缺少沉淀；
-- 名片、产品资料与销售跟进相互割裂；
-- 企业内容重复维护，客户咨询响应成本较高。
+| 工具 | 最低版本 | 用途 |
+| --- | --- | --- |
+| Python | 3.12 | 后端运行环境 |
+| uv 或 pip | uv 最新稳定版 / pip 24+ | Python 依赖和虚拟环境管理，二选一 |
+| Node.js | 22.12 | 前端运行环境 |
+| npm | 10 | 前端依赖和工作区管理 |
+| Docker | 可选 | 容器化启动 |
 
-核心使用角色包括：
+### Windows 一键启动
 
-| 角色 | 主要诉求 |
-| --- | --- |
-| 企业管理员 | 管理企业资料、组织、员工、模板和权限 |
-| 员工 / 销售 | 创建并分享名片，展示产品，沉淀和跟进客户 |
-| 客户 | 浏览企业与员工信息，咨询、预约或提交需求 |
-| 平台运营方 | 管理租户、套餐、内容安全和平台运行状态 |
+在项目根目录执行：
 
-## 规划能力
-
-### 数字名片
-
-- 企业与员工数字名片
-- 企业统一模板与品牌视觉
-- H5 名片、二维码分享
-- 联系方式保存与一键咨询
-- 分享渠道和访问来源追踪
-
-### 企业与内容管理
-
-- 企业、部门、员工与角色管理
-- 企业介绍、官网页面和认证信息
-- 产品分类、产品详情、案例与资料库
-- 图片、视频和 PDF 等素材管理
-
-### 客户经营
-
-- 客户档案、标签与来源记录
-- 浏览、留资、咨询和跟进记录
-- 商机阶段与销售漏斗
-- 活动报名、在线预约和营销表单
-
-### 数据分析与 AI
-
-- 名片访问、分享和转化分析
-- 内容热度与客户来源分析
-- 基于企业知识库的智能问答
-- 企业介绍生成与产品推荐辅助
-- 销售沟通和客户跟进辅助
-
-### SaaS 平台能力
-
-- 多租户数据隔离
-- RBAC 权限控制
-- 套餐、配额与平台运营管理
-- 开放 API、Webhook 和消息通知
-
-## 规划中的业务流程
-
-```text
-企业入驻
-   │
-   ├── 配置企业资料、组织和品牌模板
-   │
-   ├── 邀请员工并生成数字名片
-   │
-   └── 维护产品、案例和企业知识
-                    │
-                    ▼
-             员工分享数字名片
-                    │
-                    ▼
-      客户浏览 ── 咨询 / 预约 / 留资
-                    │
-                    ▼
-          客户沉淀 ── 跟进 ── 商机转化
-                    │
-                    ▼
-             数据分析与运营优化
+```powershell
+.\scripts\dev.ps1
 ```
 
-## 技术架构设想
+脚本首次运行会自动完成以下操作：
 
-项目尚未进入代码实现阶段。结合当前产品目标，初期更适合采用模块化单体架构，在业务规模和团队边界明确后再按需拆分服务。
+1. 根据 `.env.example` 创建本地 `.env`；
+2. 安装 Python 与前端依赖；
+3. 执行数据库迁移；
+4. 同时启动 API、管理端和 H5。
 
-```text
-Web / H5 / 管理后台
-        │
-        ▼
-   FastAPI 应用
-        │
-        ├── 认证与权限
-        ├── 企业与组织
-        ├── 数字名片
-        ├── 产品与内容
-        ├── CRM 与营销
-        ├── 数据分析
-        └── AI 与知识库
-        │
-        ├── MySQL / PostgreSQL
-        ├── Redis
-        └── 对象存储
+首次安装需要能够访问 Python 与 npm 软件源。启动完成后访问：
+
+| 服务 | 地址 |
+| --- | --- |
+| 管理端 | <http://localhost:5173> |
+| H5 | <http://localhost:5174> |
+| API | <http://localhost:8000> |
+| API 文档 | <http://localhost:8000/docs> |
+| OpenAPI | <http://localhost:8000/openapi.json> |
+| 存活检查 | <http://localhost:8000/api/v1/health> |
+| 数据库就绪检查 | <http://localhost:8000/api/v1/ready> |
+
+按 `Ctrl+C` 可同时停止三个开发服务。
+
+### 分步启动
+
+需要分别调试服务时，可以按以下方式启动。
+
+```powershell
+# 1. 创建环境配置
+Copy-Item .env.example .env
+
+# 2. 安装依赖并迁移数据库
+uv sync
+npm install
+uv run alembic -c backend/alembic.ini upgrade head
+
+# 3. 启动后端
+uv run uvicorn digitalcard.main:app --app-dir backend/src --reload --port 8000
+
+# 4. 在另外两个终端分别启动前端
+npm run dev -w @digitalcard/admin
+npm run dev -w @digitalcard/h5
 ```
 
-候选技术栈如下，最终选型应以首个可运行版本为准：
+也可以先执行初始化脚本，再按需启动服务：
 
-| 层级 | 候选方案 |
-| --- | --- |
-| 后端 | Python、FastAPI、SQLAlchemy、Alembic、Pydantic |
-| 前端 | Vue 3、TypeScript、Vite、Element Plus、Pinia |
-| 数据 | MySQL 或 PostgreSQL、Redis |
-| 文件存储 | S3 兼容对象存储 / MinIO |
-| 异步任务 | Celery 或其他任务队列（按实际需求引入） |
-| 交付运维 | Docker、Nginx、CI/CD |
+```powershell
+.\scripts\setup.ps1
+```
 
-## 当前仓库
+### 使用 pip 安装
+
+不使用 uv 时，可以通过标准 `venv + pip` 安装相同的运行、开发和测试依赖：
+
+```powershell
+# 创建并激活虚拟环境
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# 仅安装后端运行依赖
+python -m pip install -r requirements.txt
+
+# 开发环境请改用这一条，它会同时安装测试和代码检查工具
+python -m pip install -r requirements-dev.txt
+```
+
+也可以执行 pip 初始化脚本，它会创建环境配置和虚拟环境，同时安装前后端依赖并执行迁移：
+
+```powershell
+.\scripts\setup-pip.ps1
+```
+
+初始化后分别启动各服务：
+
+```powershell
+# 后端
+.\.venv\Scripts\python.exe -m uvicorn digitalcard.main:app --app-dir backend/src --reload --port 8000
+
+# 管理端与 H5（分别在新终端运行）
+npm run dev -w @digitalcard/admin
+npm run dev -w @digitalcard/h5
+```
+
+`requirements.txt` 对应生产运行依赖，`requirements-dev.txt` 在其基础上增加测试、覆盖率和代码检查工具。修改 Python 依赖时必须同步更新这两个文件与 `pyproject.toml`。
+
+## 配置规范
+
+应用通过环境变量读取配置。根目录 `.env.example` 是本地模板，不得提交实际 `.env`。
+
+| 变量 | 必填 | 默认值 / 示例 | 说明 |
+| --- | --- | --- | --- |
+| `APP_NAME` | 否 | `DigitalCard API` | 服务名称 |
+| `APP_ENV` | 否 | `development` | `development`、`test`、`staging` 或 `production` |
+| `APP_VERSION` | 否 | `0.1.0` | 对外版本号 |
+| `SECRET_KEY` | 是 | 无安全默认值 | 至少 32 个字符；生产环境必须使用随机密钥 |
+| `DATABASE_URL` | 否 | `sqlite:///./data/digitalcard.db` | SQLAlchemy 数据库连接地址 |
+| `LOG_LEVEL` | 否 | `INFO` | 日志级别 |
+| `CORS_ORIGINS` | 否 | 本地两个前端地址 | 逗号分隔的可信来源 |
+| `VITE_API_BASE_URL` | 否 | 本地 API 地址 | 前端构建时的 API 基础地址 |
+
+不同环境的参考模板位于 `deploy/env/`。应用在 `SECRET_KEY` 缺失、过短或生产环境仍使用示例密钥时会拒绝启动并给出配置错误。
+
+> 不要将密码、密钥、令牌、生产数据库地址或客户数据提交到版本库。
+
+## 数据库迁移
+
+```powershell
+# 升级到最新版本
+uv run alembic -c backend/alembic.ini upgrade head
+
+# 查看当前版本
+uv run alembic -c backend/alembic.ini current
+
+# 创建新迁移
+uv run alembic -c backend/alembic.ini revision --autogenerate -m "describe change"
+
+# 回退一个版本
+uv run alembic -c backend/alembic.ini downgrade -1
+```
+
+使用 pip 虚拟环境时，将上述命令中的 `uv run alembic` 替换为 `python -m alembic`。
+
+业务模型新增后，需要在 `backend/migrations/env.py` 中确保模型已被加载，随后审查自动生成的迁移内容，不能未经检查直接执行。
+
+## 质量检查
+
+运行完整检查：
+
+```powershell
+.\scripts\check.ps1
+```
+
+也可以单独执行：
+
+```powershell
+uv run ruff check backend
+uv run ruff format --check backend
+uv run pytest
+npm run typecheck
+npm test
+npm run build
+```
+
+使用 pip 虚拟环境时，后端检查命令对应为：
+
+```powershell
+python -m ruff check backend
+python -m ruff format --check backend
+python -m pytest
+```
+
+CI 会在推送到 `main` 或创建 Pull Request 时执行相同的后端检查、迁移验证、前端测试和生产构建。
+
+## Docker 启动
+
+先创建环境文件，再启动容器：
+
+```powershell
+Copy-Item .env.example .env
+docker compose up --build
+```
+
+容器地址：
+
+- 管理端：<http://localhost:8080>
+- H5：<http://localhost:8081>
+- API 与文档：<http://localhost:8000>、<http://localhost:8000/docs>
+
+停止服务：
+
+```powershell
+docker compose down
+```
+
+本地 SQLite 数据保存在命名卷中。生产部署前需要替换示例密钥、配置正式数据库和可信域名，并根据实际基础设施补充备份、TLS、监控与资源限制。
+
+## 项目结构
 
 ```text
 DigitalCard/
-├── .gitignore
-├── LICENSE
-└── README.md
+├── backend/
+│   ├── migrations/              # Alembic 迁移
+│   ├── src/digitalcard/
+│   │   ├── api/                 # API 路由
+│   │   ├── core/                # 配置、日志与错误处理
+│   │   ├── db/                  # 数据库基础设施
+│   │   ├── middleware/          # HTTP 中间件
+│   │   └── main.py              # FastAPI 入口
+│   ├── tests/                   # 后端测试
+│   ├── alembic.ini
+│   └── Dockerfile
+├── frontend/
+│   ├── admin/                   # 企业管理端
+│   ├── h5/                      # 移动端名片页面
+│   └── Dockerfile
+├── deploy/
+│   ├── env/                     # 分环境配置模板
+│   └── nginx/                   # 前端容器配置
+├── docs/                        # 产品与研发文档
+├── scripts/                     # 初始化、启动和检查脚本
+├── .github/workflows/ci.yml     # 持续集成
+├── .env.example
+├── compose.yaml
+├── package.json                 # npm 工作区
+├── pyproject.toml               # uv / Python 项目配置
+├── requirements.txt             # pip 运行依赖
+└── requirements-dev.txt         # pip 开发与测试依赖
 ```
 
-当前没有可执行程序，因此暂不提供安装和启动命令。完成工程初始化后，本文档应补充：
+## API 响应约定
 
-- 环境要求与依赖版本；
-- 本地开发和容器启动方式；
-- 环境变量示例；
-- 数据库迁移与初始化方法；
-- 测试、构建和部署命令；
-- API 文档与演示地址。
+错误响应采用统一结构，并通过响应头 `X-Request-ID` 提供可追踪的请求编号：
 
-## 建议的项目结构
-
-```text
-DigitalCard/
-├── backend/              # FastAPI 后端
-│   ├── src/              # 业务代码
-│   ├── migrations/       # 数据库迁移
-│   └── tests/            # 后端测试
-├── frontend/             # Vue 管理端与 Web 页面
-├── docs/                 # 产品、架构和部署文档
-├── deploy/               # 容器与部署配置
-├── scripts/              # 开发和运维脚本
-├── .env.example          # 环境变量示例
-└── README.md
+```json
+{
+  "error": {
+    "code": "not_found",
+    "message": "Not Found",
+    "request_id": "5e61e637899d45d6a3b6d9cb5f70edb2"
+  }
+}
 ```
 
-## 建设路线
+后续业务接口统一挂载在 `/api/v1` 下。公开 API 发生不兼容变化时应增加版本，不得静默破坏已有客户端。
 
-- [ ] **阶段一：工程基础** — 项目骨架、认证授权、数据库迁移、日志、测试与持续集成
-- [ ] **阶段二：数字名片 MVP** — 企业、部门、员工、名片模板、H5 展示与二维码分享
-- [ ] **阶段三：内容与客户沉淀** — 产品中心、素材管理、客户留资、标签与跟进记录
-- [ ] **阶段四：经营分析** — 访问事件、渠道来源、分享统计与转化看板
-- [ ] **阶段五：平台与智能化** — 多租户、套餐配额、企业知识库与 AI 助手
+## 版本路线
 
-路线图将随产品验证结果调整；功能完成后应以代码、测试和发布记录更新勾选状态。
+- [x] **V0.1.0：工程底座** — 后端、管理端、H5、迁移、测试、CI 与容器
+- [ ] **V0.2.0：账户与登录** — 账户管理、登录状态与基础安全
+- [ ] **V0.3.0：企业与权限** — 企业空间、组织架构、租户隔离与 RBAC
+- [ ] **V0.4.0～V1.0.0：数字名片 MVP** — 员工、名片、分享、产品、线索与 CRM
+- [ ] **V1.1.0～V1.5.0：经营平台** — 分析、营销、SaaS、AI 与开放平台
 
-详细的小版本范围、依赖关系和验收标准见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
-
-## 参与贡献
-
-欢迎通过 Issue 提交需求建议和问题反馈，也欢迎通过 Pull Request 参与建设。
-
-提交代码前，建议确保：
-
-- 改动范围清晰，并附带必要说明；
-- 新功能包含相应测试与文档；
-- 不提交密钥、令牌、客户数据或本地环境文件；
-- 代码通过项目约定的格式检查和测试。
+完整范围、依赖关系和验收条件见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
 
 ## 开源许可
 
 本项目采用 [Apache License 2.0](LICENSE) 许可证。
-
----
-
-DigitalCard 的目标不是简单地把纸质名片搬到线上，而是将企业展示、客户触达和业务跟进连接成一条可持续运营的链路。

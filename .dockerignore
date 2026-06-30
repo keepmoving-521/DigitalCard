@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.venv
+node_modules
+frontend/*/dist
+data
+reports
+*.pyc
+__pycache__
+.env
+
