@@ -13,6 +13,8 @@ import RolesView from './views/RolesView.vue'
 import EmployeesView from './views/EmployeesView.vue'
 import MyProfileView from './views/MyProfileView.vue'
 import AcceptInviteView from './views/AcceptInviteView.vue'
+import CardEditorView from './views/CardEditorView.vue'
+import CardTemplateView from './views/CardTemplateView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -50,6 +52,21 @@ const router = createRouter({
       path: '/profile',
       component: MyProfileView,
       meta: { requiresAuth: true, permission: 'employee.self_update' },
+    },
+    {
+      path: '/my-card',
+      component: CardEditorView,
+      meta: { requiresAuth: true, permission: 'card.read' },
+    },
+    {
+      path: '/company/card-template',
+      component: CardTemplateView,
+      meta: { requiresAuth: true, permission: 'card.template.manage' },
+    },
+    {
+      path: '/company/cards/:employeeId',
+      component: CardEditorView,
+      meta: { requiresAuth: true, permission: 'card.manage' },
     },
     {
       path: '/company/roles',

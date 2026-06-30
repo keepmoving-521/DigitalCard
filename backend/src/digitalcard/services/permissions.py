@@ -30,6 +30,11 @@ class Permission(StrEnum):
     EMPLOYEE_IMPORT = "employee.import"
     EMPLOYEE_INVITE = "employee.invite"
     EMPLOYEE_SELF_UPDATE = "employee.self_update"
+    CARD_READ = "card.read"
+    CARD_EDIT_SELF = "card.edit_self"
+    CARD_PUBLISH_SELF = "card.publish_self"
+    CARD_MANAGE = "card.manage"
+    CARD_TEMPLATE_MANAGE = "card.template.manage"
 
 
 PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
@@ -52,6 +57,11 @@ PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
     Permission.EMPLOYEE_IMPORT.value: ("批量导入员工", "员工"),
     Permission.EMPLOYEE_INVITE.value: ("邀请员工开通账户", "员工"),
     Permission.EMPLOYEE_SELF_UPDATE.value: ("维护个人资料", "员工"),
+    Permission.CARD_READ.value: ("查看名片", "名片"),
+    Permission.CARD_EDIT_SELF.value: ("编辑本人名片", "名片"),
+    Permission.CARD_PUBLISH_SELF.value: ("发布本人名片", "名片"),
+    Permission.CARD_MANAGE.value: ("管理企业员工名片", "名片"),
+    Permission.CARD_TEMPLATE_MANAGE.value: ("管理企业名片模板", "名片"),
 }
 
 ROLE_DEFINITIONS: dict[UserRole, tuple[str, str]] = {
@@ -69,6 +79,11 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CONTENT_MANAGE.value,
         Permission.EMPLOYEE_READ.value,
         Permission.EMPLOYEE_SELF_UPDATE.value,
+        Permission.CARD_READ.value,
+        Permission.CARD_EDIT_SELF.value,
+        Permission.CARD_PUBLISH_SELF.value,
+        Permission.CARD_MANAGE.value,
+        Permission.CARD_TEMPLATE_MANAGE.value,
     },
     UserRole.SALES: {
         Permission.COMPANY_READ.value,
@@ -76,12 +91,18 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CUSTOMER_MANAGE.value,
         Permission.EMPLOYEE_READ.value,
         Permission.EMPLOYEE_SELF_UPDATE.value,
+        Permission.CARD_READ.value,
+        Permission.CARD_EDIT_SELF.value,
+        Permission.CARD_PUBLISH_SELF.value,
     },
     UserRole.EMPLOYEE: {
         Permission.COMPANY_READ.value,
         Permission.DEPARTMENT_READ.value,
         Permission.EMPLOYEE_READ.value,
         Permission.EMPLOYEE_SELF_UPDATE.value,
+        Permission.CARD_READ.value,
+        Permission.CARD_EDIT_SELF.value,
+        Permission.CARD_PUBLISH_SELF.value,
     },
 }
 

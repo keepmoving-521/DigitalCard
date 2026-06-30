@@ -5,6 +5,7 @@ import { authState } from './auth'
 import AppShell from './components/AppShell.vue'
 import ForbiddenView from './views/ForbiddenView.vue'
 import LoginView from './views/LoginView.vue'
+import CardPreview from './components/CardPreview.vue'
 
 function testRouter() {
   return createRouter({
@@ -18,6 +19,9 @@ function testRouter() {
       { path: '/company/settings', component: { template: '<div>Company</div>' } },
       { path: '/company/departments', component: { template: '<div>Departments</div>' } },
       { path: '/company/employees', component: { template: '<div>Employees</div>' } },
+      { path: '/company/card-template', component: { template: '<div>Template</div>' } },
+      { path: '/company/cards/:employeeId', component: { template: '<div>Card</div>' } },
+      { path: '/my-card', component: { template: '<div>My card</div>' } },
       { path: '/profile', component: { template: '<div>Profile</div>' } },
       { path: '/company/roles', component: { template: '<div>Roles</div>' } },
       { path: '/company/audits', component: { template: '<div>Audits</div>' } },
@@ -77,5 +81,21 @@ describe('Account foundation views', () => {
     expect(wrapper.find('a[href="/company/employees"]').exists()).toBe(true)
     expect(wrapper.find('a[href="/company/roles"]').exists()).toBe(false)
     expect(wrapper.find('a[href="/admin/accounts"]').exists()).toBe(false)
+  })
+
+  it('renders a live digital card preview', () => {
+    const wrapper = mount(CardPreview, {
+      props: {
+        device: 'mobile',
+        data: {
+          company_name: '示例企业', display_name: '张三', headline: '客户顾问',
+          phone: '13800000000', theme_color: '#123456',
+          module_order: ['profile', 'contact', 'social', 'bio'], socials: [],
+        },
+      },
+    })
+    expect(wrapper.text()).toContain('张三')
+    expect(wrapper.text()).toContain('13800000000')
+    expect(wrapper.classes()).not.toContain('desktop')
   })
 })
