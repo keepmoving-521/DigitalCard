@@ -215,3 +215,30 @@ async def test_self_edit_policy_and_public_inactive_visibility(client: AsyncClie
     public = await client.get(f"/api/v1/public/employees/{employee_id}")
     assert public.status_code == 200
     assert public.json()["employment_status"] == "inactive"
+
+
+async def test_sales_account_gets_profile_on_first_personal_profile_access(
+    client: AsyncClient,
+) -> None:
+    platform_session, company, _ = await bootstrap_two_companies(client)
+    await create_tenant_user(
+        client,
+        platform_session,
+        "sales-profile@example.com",
+        str(company["id"]),
+        "sales",
+    )
+    sales_session = await sign_in(client, "sales-profile@example.com")
+    first = await client.get("/api/v1/tenant/employees/me", headers=headers(sales_session))
+    assert first.status_code == 200, first.text
+    assert first.json()["email"] == "sales-profile@example.com"
+    assert first.json()["employee_no"].startswith("AUTO-")
+
+    updated = await client.patch(
+        "/api/v1/tenant/employees/me",
+        headers=headers(sales_session),
+        json={"bio": "销售顾问个人简介"},
+    )
+    assert updated.status_code == 200, updated.text
+    assert updated.json()["id"] == first.json()["id"]
+    assert updated.json()["bio"] == "销售顾问个人简介"

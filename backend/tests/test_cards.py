@@ -61,6 +61,22 @@ async def setup_employee(client: AsyncClient):  # type: ignore[no-untyped-def]
     return platform, company, admin_session, owner_session, employee
 
 
+async def test_tenant_admin_gets_employee_profile_when_opening_my_card(
+    client: AsyncClient,
+) -> None:
+    _, _, _ = await bootstrap_two_companies(client)
+    admin_session = await sign_in(client, "admin-a@example.com")
+    response = await client.get("/api/v1/tenant/cards/me", headers=headers(admin_session))
+    assert response.status_code == 200, response.text
+    card = response.json()
+    assert card["status"] == "draft"
+    assert card["draft_data"]["display_name"] == "admin-a"
+    profile = await client.get("/api/v1/tenant/employees/me", headers=headers(admin_session))
+    assert profile.status_code == 200
+    assert profile.json()["email"] == "admin-a@example.com"
+    assert profile.json()["employee_no"].startswith("AUTO-")
+
+
 async def test_draft_changes_do_not_change_published_snapshot(client: AsyncClient) -> None:
     _, _, _, owner_session, _ = await setup_employee(client)
     response = await client.patch(

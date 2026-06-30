@@ -35,6 +35,7 @@ from digitalcard.services.cards import (
     resolve_card_data,
     validate_publishable,
 )
+from digitalcard.services.employee_profiles import get_or_create_employee_for_user
 from digitalcard.services.permissions import Permission
 from digitalcard.services.tenancy import record_tenant_audit
 
@@ -49,12 +50,7 @@ def tenant_company(db: Session, company_id: str) -> Company:
 
 
 def employee_for_user(db: Session, user: User) -> Employee:
-    employee = db.scalar(
-        select(Employee).where(Employee.company_id == user.company_id, Employee.user_id == user.id)
-    )
-    if employee is None:
-        raise AppError("employee_profile_not_found", "Employee profile was not found", 404)
-    return employee
+    return get_or_create_employee_for_user(db, user)
 
 
 def tenant_employee(db: Session, company_id: str, employee_id: str) -> Employee:

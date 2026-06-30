@@ -26,6 +26,7 @@ from digitalcard.schemas.employee import (
     EmployeeStatusRequest,
     EmployeeUpdateRequest,
 )
+from digitalcard.services.employee_profiles import get_or_create_employee_for_user
 from digitalcard.services.invitations import issue_employee_invitation
 from digitalcard.services.permissions import Permission
 from digitalcard.services.tenancy import record_tenant_audit
@@ -164,11 +165,9 @@ def get_my_employee(
     user: Annotated[User, Depends(require_permission(Permission.EMPLOYEE_SELF_UPDATE))],
     db: Annotated[Session, Depends(get_db)],
 ) -> Employee:
-    employee = db.scalar(
-        select(Employee).where(Employee.company_id == user.company_id, Employee.user_id == user.id)
-    )
-    if employee is None:
-        raise AppError("employee_profile_not_found", "Employee profile was not found", 404)
+    employee = get_or_create_employee_for_user(db, user)
+    db.commit()
+    db.refresh(employee)
     return employee
 
 
@@ -178,11 +177,7 @@ def update_my_employee(
     user: Annotated[User, Depends(require_permission(Permission.EMPLOYEE_SELF_UPDATE))],
     db: Annotated[Session, Depends(get_db)],
 ) -> Employee:
-    employee = db.scalar(
-        select(Employee).where(Employee.company_id == user.company_id, Employee.user_id == user.id)
-    )
-    if employee is None:
-        raise AppError("employee_profile_not_found", "Employee profile was not found", 404)
+    employee = get_or_create_employee_for_user(db, user)
     changes = payload.model_dump(exclude_unset=True)
     company = db.get(Company, user.company_id)
     denied = set(changes) - set(company.employee_self_editable_fields or [])
