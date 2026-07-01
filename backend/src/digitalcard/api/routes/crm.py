@@ -48,6 +48,7 @@ from digitalcard.schemas.crm import (
     StageUpdateRequest,
     TimelineEventResponse,
 )
+from digitalcard.services.analytics import add_business_event
 from digitalcard.services.permissions import Permission, permissions_for_user
 from digitalcard.services.tenancy import record_tenant_audit
 
@@ -127,7 +128,7 @@ def convert_lead(
     owner_id = payload.owner_employee_id or lead.assigned_employee_id or lead.owner_employee_id
     if payload.owner_employee_id and not can_manage_all(db, user):
         raise AppError("permission_denied", "Only administrators can select an owner", 403)
-    active_employee(db, lead.company_id, owner_id)
+    owner = active_employee(db, lead.company_id, owner_id)
     customer = Customer(
         company_id=lead.company_id,
         owner_employee_id=owner_id,
@@ -150,6 +151,20 @@ def convert_lead(
     )
     lead.converted_customer_id = customer.id
     lead.status = LeadStatus.CONVERTED.value
+    add_business_event(
+        db,
+        company_id=lead.company_id,
+        employee=owner,
+        card_id=lead.card_id,
+        product_id=lead.product_id,
+        lead_id=lead.id,
+        customer_id=customer.id,
+        event_type="lead_converted",
+        category="conversion",
+        channel=lead.source,
+        dedupe_key=f"lead:{lead.id}:converted",
+        details={"customer_id": customer.id},
+    )
     add_event(
         db,
         customer,

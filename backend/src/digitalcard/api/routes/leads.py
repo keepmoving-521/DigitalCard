@@ -1,3 +1,4 @@
+import hashlib
 import re
 from datetime import timedelta
 from typing import Annotated
@@ -24,6 +25,7 @@ from digitalcard.schemas.lead import (
     PublicLeadCreateRequest,
     PublicLeadCreateResponse,
 )
+from digitalcard.services.analytics import add_business_event
 from digitalcard.services.permissions import Permission, permissions_for_user
 from digitalcard.services.tenancy import record_tenant_audit
 
@@ -137,6 +139,22 @@ def create_public_lead(
     )
     db.add(lead)
     db.flush()
+    add_business_event(
+        db,
+        company_id=card.company_id,
+        employee=owner,
+        card_id=card.id,
+        product_id=payload.product_id,
+        lead_id=lead.id,
+        event_type="lead_submitted",
+        category="lead",
+        channel=payload.source,
+        visitor_hash=hashlib.sha256(contact.encode()).hexdigest(),
+        dedupe_key=f"lead:{lead.id}:submitted",
+        is_internal=payload.source == "internal",
+        details={"duplicate_count": 0},
+        occurred_at=now,
+    )
     notify_user(db, owner.user_id, card.company_id, lead, "收到新线索")
     admins = db.scalars(
         select(User).where(

@@ -1,4 +1,5 @@
 from digitalcard.models.account import LoginAudit, RefreshSession, User, UserRole
+from digitalcard.models.analytics import BusinessEvent
 from digitalcard.models.card import CardEvent, CardEventType, CardStatus, CardTemplate, DigitalCard
 from digitalcard.models.crm import (
     Customer,
@@ -32,6 +33,7 @@ from digitalcard.models.product import (
 
 __all__ = [
     "CardStatus",
+    "BusinessEvent",
     "CardEvent",
     "CardEventType",
     "CardTemplate",

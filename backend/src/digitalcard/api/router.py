@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from digitalcard.api.routes.admin_users import router as admin_router
+from digitalcard.api.routes.analytics import router as analytics_router
 from digitalcard.api.routes.auth import router as auth_router
 from digitalcard.api.routes.cards import router as cards_router
 from digitalcard.api.routes.crm import router as crm_router
@@ -30,3 +31,4 @@ api_router.include_router(products_router)
 api_router.include_router(leads_router)
 api_router.include_router(crm_router)
 api_router.include_router(operations_router)
+api_router.include_router(analytics_router)

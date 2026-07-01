@@ -6,6 +6,7 @@ from sqlalchemy import engine_from_config, pool
 from digitalcard.core.config import get_settings
 from digitalcard.db.base import Base
 from digitalcard.models import (  # noqa: F401
+    BusinessEvent,
     CardEvent,
     CardTemplate,
     Company,

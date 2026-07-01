@@ -179,6 +179,7 @@ class CardEventRequest(BaseModel):
     event_type: CardEventType
     visitor_id: str = Field(min_length=8, max_length=128)
     source: str = Field(default="direct", min_length=1, max_length=64)
+    product_id: str | None = Field(default=None, max_length=36)
 
     @field_validator("source")
     @classmethod

@@ -3,7 +3,7 @@ import re
 from typing import Annotated
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends, Query, Response, status
+from fastapi import APIRouter, Depends, Query, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -15,7 +15,9 @@ from digitalcard.db.session import get_db
 from digitalcard.models.card import CardEvent, CardEventType, CardStatus, DigitalCard
 from digitalcard.models.employee import Employee, EmployeeStatus
 from digitalcard.models.organization import Company, CompanyStatus
+from digitalcard.models.product import Product, ProductStatus
 from digitalcard.schemas.card import CardEventRequest, CardEventResponse, PublicCardResponse
+from digitalcard.services.analytics import add_business_event, is_bot_user_agent
 from digitalcard.services.qr import qr_svg
 
 router = APIRouter(prefix="/public/cards", tags=["public cards"])
@@ -93,6 +95,7 @@ def get_card_qr(
 def record_card_event(
     card_id: str,
     payload: CardEventRequest,
+    request: Request,
     response: Response,
     db: Annotated[Session, Depends(get_db)],
 ) -> CardEventResponse:
@@ -104,6 +107,18 @@ def record_card_event(
     dedupe_key = hashlib.sha256(
         f"{card.id}:{payload.event_type.value}:{payload.source}:{visitor_hash}:{bucket}".encode()
     ).hexdigest()
+    employee = db.get(Employee, card.employee_id)
+    product_id = None
+    if payload.product_id:
+        product = db.scalar(
+            select(Product).where(
+                Product.id == payload.product_id,
+                Product.company_id == card.company_id,
+                Product.status == ProductStatus.PUBLISHED.value,
+            )
+        )
+        if product and product.id in card.published_data.get("recommended_product_ids", []):
+            product_id = product.id
     db.add(
         CardEvent(
             card_id=card.id,
@@ -114,6 +129,28 @@ def record_card_event(
             dedupe_key=dedupe_key,
             occurred_at=now,
         )
+    )
+    category = (
+        "view"
+        if payload.event_type == CardEventType.VIEW
+        else "share"
+        if payload.event_type in {CardEventType.SHARE_COPY, CardEventType.QR_OPEN}
+        else "click"
+    )
+    add_business_event(
+        db,
+        company_id=card.company_id,
+        employee=employee,
+        card_id=card.id,
+        product_id=product_id,
+        event_type=payload.event_type.value,
+        category=category,
+        channel=payload.source,
+        visitor_hash=visitor_hash,
+        dedupe_key=f"card:{dedupe_key}",
+        is_bot=is_bot_user_agent(request.headers.get("user-agent")),
+        is_internal=payload.source == "internal",
+        occurred_at=now,
     )
     try:
         db.commit()

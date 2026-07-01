@@ -1,4 +1,4 @@
-# DigitalCard V1.0 API 使用说明
+# DigitalCard V1.1 API 使用说明
 
 服务启动后访问 `/docs` 查看 Swagger UI，访问 `/openapi.json` 获取机器可读的 OpenAPI 文档。业务接口统一使用 `/api/v1` 前缀。
 
@@ -22,5 +22,12 @@
 | 线索 | `/tenant/leads`、`/public/cards/{id}/leads` | 留资、分配和领取 |
 | CRM | `/tenant/customers`、`/tenant/opportunities` | 客户、跟进、商机和漏斗 |
 | 运维 | `/tenant/onboarding`、`/tenant/monitoring` | 初始化进度和运行指标 |
+| 经营分析 | `/tenant/analytics` | 指标、趋势、排行、漏斗、抽样事件和报表导出 |
+
+## 经营分析
+
+- `GET /tenant/analytics/dashboard`：按日期、部门、员工、名片、产品和渠道筛选，返回指标、日趋势、排行、漏斗、数据质量、事件样本及最后更新时间；日期跨度最大 366 天；
+- `GET /tenant/analytics/export`：导出当前权限和筛选范围内的有效事件 CSV，最多 100,000 行，仅具有 `analytics.export` 权限的角色可用；
+- `ranking_dimension` 支持 `department`、`employee`、`card`、`product`、`channel`，企业本身由当前租户范围确定。
 
 字段、枚举、请求示例及响应结构以当前版本 `/openapi.json` 为准，禁止客户端依赖未声明字段。
