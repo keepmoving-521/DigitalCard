@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from digitalcard.core.errors import AppError
 from digitalcard.models.account import User
 from digitalcard.models.employee import Employee, EmployeeStatus
+from digitalcard.services.quotas import enforce_quota
 from digitalcard.services.tenancy import record_tenant_audit
 
 
@@ -51,6 +52,7 @@ def get_or_create_employee_for_user(db: Session, user: User) -> Employee:
     ):
         suffix += 1
         employee_number = f"{base_number}-{suffix}"
+    enforce_quota(db, user.company_id, "employees")
     employee = Employee(
         company_id=user.company_id,
         employee_no=employee_number,

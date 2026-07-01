@@ -28,12 +28,17 @@ from digitalcard.models import (  # noqa: F401
     Opportunity,
     OpportunityStage,
     OpportunityStageHistory,
+    PlatformOperationLog,
     Product,
     ProductCategory,
     RefreshSession,
     RolePermission,
+    SaasPlan,
+    SubscriptionRenewal,
     TenantAudit,
     TenantRole,
+    TenantSubscription,
+    TenantSupportGrant,
     User,
 )
 

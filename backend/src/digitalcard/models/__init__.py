@@ -31,6 +31,13 @@ from digitalcard.models.product import (
     ProductCategory,
     ProductStatus,
 )
+from digitalcard.models.saas import (
+    PlatformOperationLog,
+    SaasPlan,
+    SubscriptionRenewal,
+    TenantSubscription,
+    TenantSupportGrant,
+)
 
 __all__ = [
     "CardStatus",
@@ -67,6 +74,11 @@ __all__ = [
     "Product",
     "ProductCategory",
     "ProductStatus",
+    "PlatformOperationLog",
+    "SaasPlan",
+    "SubscriptionRenewal",
+    "TenantSubscription",
+    "TenantSupportGrant",
     "RefreshSession",
     "RolePermission",
     "TenantAudit",

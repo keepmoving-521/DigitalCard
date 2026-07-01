@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, status
@@ -6,9 +7,11 @@ from sqlalchemy.orm import Session
 
 from digitalcard.api.dependencies import PlatformAdmin
 from digitalcard.core.errors import AppError
+from digitalcard.core.time import utc_now
 from digitalcard.db.session import get_db
 from digitalcard.models.account import User
 from digitalcard.models.organization import Company, CompanyStatus
+from digitalcard.models.saas import SaasPlan, SubscriptionStatus, TenantSubscription
 from digitalcard.schemas.organization import (
     CompanyCreateRequest,
     CompanyResponse,
@@ -52,6 +55,26 @@ def create_company(
     db.flush()
     seed_tenant_roles(db, company.id)
     seed_opportunity_stages(db, company.id)
+    default_plan = db.scalar(select(SaasPlan).where(SaasPlan.code == "trial"))
+    if default_plan is None:
+        default_plan = SaasPlan(
+            code="trial",
+            name="试用版",
+            employee_limit=20,
+            card_limit=20,
+            storage_limit_bytes=1_073_741_824,
+        )
+        db.add(default_plan)
+        db.flush()
+    db.add(
+        TenantSubscription(
+            company_id=company.id,
+            plan_id=default_plan.id,
+            status=SubscriptionStatus.TRIAL.value,
+            starts_at=utc_now(),
+            expires_at=utc_now() + timedelta(days=14),
+        )
+    )
     record_tenant_audit(
         db,
         company.id,

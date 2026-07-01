@@ -5,6 +5,7 @@ from digitalcard.core.errors import AppError
 from digitalcard.models.card import CardTemplate, DigitalCard
 from digitalcard.models.employee import Employee
 from digitalcard.models.organization import Company
+from digitalcard.services.quotas import enforce_quota
 
 
 def get_or_create_template(db: Session, company: Company) -> CardTemplate:
@@ -43,6 +44,7 @@ def initial_draft(employee: Employee) -> dict[str, object]:
 def get_or_create_card(db: Session, employee: Employee) -> DigitalCard:
     card = db.scalar(select(DigitalCard).where(DigitalCard.employee_id == employee.id))
     if card is None:
+        enforce_quota(db, employee.company_id, "cards")
         card = DigitalCard(
             company_id=employee.company_id,
             employee_id=employee.id,

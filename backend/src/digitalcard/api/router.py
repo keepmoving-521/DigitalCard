@@ -15,6 +15,7 @@ from digitalcard.api.routes.platform_companies import router as platform_compani
 from digitalcard.api.routes.products import router as products_router
 from digitalcard.api.routes.public_cards import router as public_cards_router
 from digitalcard.api.routes.public_employees import router as public_employees_router
+from digitalcard.api.routes.saas import router as saas_router
 from digitalcard.api.routes.tenant_organization import router as tenant_organization_router
 
 api_router = APIRouter()
@@ -34,3 +35,4 @@ api_router.include_router(crm_router)
 api_router.include_router(operations_router)
 api_router.include_router(analytics_router)
 api_router.include_router(marketing_router)
+api_router.include_router(saas_router)

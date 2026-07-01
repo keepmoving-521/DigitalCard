@@ -1,0 +1,3 @@
+export interface SaasPlan { id: string; code: string; name: string; employee_limit: number; card_limit: number; storage_limit_bytes: number; is_active: boolean }
+export interface Subscription { company_id: string; plan_id: string; plan_name: string; status: 'trial' | 'active' | 'expired' | 'cancel_pending' | 'cancelled'; starts_at: string; expires_at: string; usage: Record<string, number>; limits: Record<string, number>; warnings: string[]; cancel_effective_at: string | null; data_cleanup_after: string | null }
+export interface TenantOverview { company_id: string; company_name: string; company_status: string; subscription: Subscription; alerts: string[] }

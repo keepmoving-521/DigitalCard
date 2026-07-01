@@ -27,7 +27,7 @@ const roleNames: Record<string, string> = {
       <article><span>会话策略</span><strong>15 分钟</strong><p>访问令牌短期有效并支持安全刷新</p></article>
     </section>
     <section class="next-card">
-      <div><p class="eyebrow">LIGHTWEIGHT MARKETING</p><h2>V1.2.0 · 营销表单与活动</h2></div>
+      <div><p class="eyebrow">SAAS OPERATIONS</p><h2>V1.3.0 · SaaS 运营与套餐配额</h2></div>
       <span>稳定版</span>
     </section>
   </AppShell>

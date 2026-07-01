@@ -29,6 +29,7 @@ from digitalcard.schemas.employee import (
 from digitalcard.services.employee_profiles import get_or_create_employee_for_user
 from digitalcard.services.invitations import issue_employee_invitation
 from digitalcard.services.permissions import Permission
+from digitalcard.services.quotas import enforce_quota
 from digitalcard.services.tenancy import record_tenant_audit
 from digitalcard.services.tokens import revoke_all_sessions
 
@@ -110,6 +111,7 @@ def validate_relations(
 def create_employee_record(
     db: Session, company_id: str, payload: EmployeeCreateRequest
 ) -> Employee:
+    enforce_quota(db, company_id, "employees")
     values = payload.model_dump()
     validate_unique_fields(db, company_id, values)
     validate_relations(db, company_id, values)

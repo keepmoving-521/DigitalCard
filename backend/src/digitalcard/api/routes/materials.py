@@ -22,6 +22,7 @@ from digitalcard.services.materials import (
     valid_signature,
 )
 from digitalcard.services.permissions import Permission
+from digitalcard.services.quotas import enforce_quota
 from digitalcard.services.tenancy import record_tenant_audit
 
 router = APIRouter(tags=["materials"])
@@ -81,6 +82,7 @@ async def upload_material(
                 output.write(chunk)
         if size == 0:
             raise AppError("material_empty", "Uploaded file is empty", 422)
+        enforce_quota(db, user.company_id, "storage", size)
         with temporary_path.open("rb") as uploaded:
             if not valid_signature(mime_type, uploaded.read(16)):
                 raise AppError(
