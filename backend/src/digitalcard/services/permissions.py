@@ -51,6 +51,9 @@ class Permission(StrEnum):
     ANALYTICS_READ = "analytics.read"
     ANALYTICS_ALL = "analytics.all"
     ANALYTICS_EXPORT = "analytics.export"
+    MARKETING_READ = "marketing.read"
+    MARKETING_MANAGE = "marketing.manage"
+    MARKETING_EXPORT = "marketing.export"
 
 
 PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
@@ -94,6 +97,9 @@ PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
     Permission.ANALYTICS_READ.value: ("查看经营分析", "分析"),
     Permission.ANALYTICS_ALL.value: ("查看企业全部经营数据", "分析"),
     Permission.ANALYTICS_EXPORT.value: ("导出经营报表", "分析"),
+    Permission.MARKETING_READ.value: ("查看营销活动", "营销"),
+    Permission.MARKETING_MANAGE.value: ("管理营销表单、活动和报名", "营销"),
+    Permission.MARKETING_EXPORT.value: ("导出营销报名", "营销"),
 }
 
 ROLE_DEFINITIONS: dict[UserRole, tuple[str, str]] = {
@@ -126,6 +132,9 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.ANALYTICS_READ.value,
         Permission.ANALYTICS_ALL.value,
         Permission.ANALYTICS_EXPORT.value,
+        Permission.MARKETING_READ.value,
+        Permission.MARKETING_MANAGE.value,
+        Permission.MARKETING_EXPORT.value,
     },
     UserRole.SALES: {
         Permission.COMPANY_READ.value,
@@ -145,6 +154,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CUSTOMER_SELF_MANAGE.value,
         Permission.OPPORTUNITY_MANAGE.value,
         Permission.ANALYTICS_READ.value,
+        Permission.MARKETING_READ.value,
     },
     UserRole.EMPLOYEE: {
         Permission.COMPANY_READ.value,

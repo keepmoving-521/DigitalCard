@@ -1,0 +1,4 @@
+export interface MarketingField { key: string; label: string; type: 'text' | 'email' | 'phone' | 'textarea' | 'select'; required: boolean; options: string[] }
+export interface MarketingForm { id: string; name: string; fields: MarketingField[]; privacy_notice: string; success_message: string; is_active: boolean; revision: number }
+export interface Campaign { id: string; form_id: string; name: string; slug: string; description: string | null; card_id: string | null; product_id: string | null; owner_employee_id: string | null; channel: string; starts_at: string; ends_at: string; capacity: number | null; status: 'draft' | 'published' | 'closed'; submission_count: number }
+export interface CampaignSubmission { id: string; campaign_id: string; lead_id: string | null; form_revision: number; form_snapshot: Record<string, unknown>; values: Record<string, unknown>; channel: string; status: 'submitted' | 'converted' | 'invalid'; created_at: string }

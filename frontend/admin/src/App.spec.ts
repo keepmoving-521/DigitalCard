@@ -28,6 +28,7 @@ function testRouter() {
       { path: '/company/leads', component: { template: '<div>Leads</div>' } },
       { path: '/company/customers', component: { template: '<div>Customers</div>' } },
       { path: '/analytics', component: { template: '<div>Analytics</div>' } },
+      { path: '/company/marketing', component: { template: '<div>Marketing</div>' } },
       { path: '/notifications', component: { template: '<div>Notifications</div>' } },
       { path: '/company/cards/:employeeId', component: { template: '<div>Card</div>' } },
       { path: '/my-card', component: { template: '<div>My card</div>' } },

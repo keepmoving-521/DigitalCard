@@ -7,6 +7,8 @@ from digitalcard.core.config import get_settings
 from digitalcard.db.base import Base
 from digitalcard.models import (  # noqa: F401
     BusinessEvent,
+    Campaign,
+    CampaignSubmission,
     CardEvent,
     CardTemplate,
     Company,
@@ -20,6 +22,7 @@ from digitalcard.models import (  # noqa: F401
     FollowUp,
     Lead,
     LoginAudit,
+    MarketingForm,
     Material,
     Notification,
     Opportunity,

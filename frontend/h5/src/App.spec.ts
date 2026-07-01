@@ -12,7 +12,7 @@ describe('H5 App', () => {
   it('renders the mobile foundation page', () => {
     const wrapper = mount(App)
     expect(wrapper.get('h1').text()).toContain('走向下一步')
-    expect(wrapper.text()).toContain('INSIGHTS READY')
+    expect(wrapper.text()).toContain('CAMPAIGNS READY')
   })
 
   it('renders a published card and share QR entry', async () => {
@@ -71,5 +71,28 @@ describe('H5 App', () => {
     const leadCall = fetchMock.mock.calls.find(([url]) => String(url).includes('/leads'))
     expect(JSON.parse(String(leadCall?.[1]?.body))).toMatchObject({ source: 'campaign', privacy_agreed: true })
     expect(wrapper.text()).toContain('咨询已提交')
+  })
+
+  it('renders and submits a dynamic marketing campaign', async () => {
+    window.history.pushState({}, '', '/campaign/summer-demo?source=poster')
+    const fetchMock = vi.fn().mockImplementation((url: string) => Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(url.includes('/submissions')
+        ? { id: 'submission-1', duplicate: false, message: '报名成功' }
+        : { id: 'campaign-1', name: '夏日体验营', description: '新品体验', state: 'open', remaining: 5, privacy_notice: '同意活动联系', success_message: '报名成功', fields: [{ key: 'name', label: '姓名', type: 'text', required: true, options: [] }, { key: 'contact', label: '联系方式', type: 'phone', required: true, options: [] }] }),
+    }))
+    vi.stubGlobal('fetch', fetchMock)
+    const wrapper = mount(App)
+    await flushPromises()
+    expect(wrapper.text()).toContain('夏日体验营')
+    const inputs = wrapper.findAll('.campaign-page form input')
+    await inputs[0].setValue('王客户')
+    await inputs[1].setValue('13800000000')
+    await wrapper.get('.privacy-consent input').setValue(true)
+    await wrapper.get('.campaign-page form').trigger('submit')
+    await flushPromises()
+    const call = fetchMock.mock.calls.find(([url]) => String(url).includes('/submissions'))
+    expect(JSON.parse(String(call?.[1]?.body))).toMatchObject({ source: 'poster', privacy_agreed: true })
+    expect(wrapper.text()).toContain('报名成功')
   })
 })

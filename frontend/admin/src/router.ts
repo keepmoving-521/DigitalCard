@@ -24,6 +24,7 @@ import MonitoringView from './views/MonitoringView.vue'
 import NotFoundView from './views/NotFoundView.vue'
 import OnboardingView from './views/OnboardingView.vue'
 import AnalyticsView from './views/AnalyticsView.vue'
+import MarketingView from './views/MarketingView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -33,6 +34,7 @@ const router = createRouter({
     { path: '/accept-invite', component: AcceptInviteView, meta: { guest: true } },
     { path: '/dashboard', component: DashboardView, meta: { requiresAuth: true } },
     { path: '/analytics', component: AnalyticsView, meta: { requiresAuth: true, permission: 'analytics.read' } },
+    { path: '/company/marketing', component: MarketingView, meta: { requiresAuth: true, permission: 'marketing.read' } },
     { path: '/onboarding', component: OnboardingView, meta: { requiresAuth: true, permission: 'company.read' } },
     { path: '/company/monitoring', component: MonitoringView, meta: { requiresAuth: true, permission: 'audit.read' } },
     {

@@ -13,6 +13,7 @@ from digitalcard.models.crm import (
 )
 from digitalcard.models.employee import Employee, EmployeeInvitation, EmployeeStatus
 from digitalcard.models.lead import Lead, LeadStatus, Notification
+from digitalcard.models.marketing import Campaign, CampaignSubmission, MarketingForm
 from digitalcard.models.organization import (
     Company,
     CompanyStatus,
@@ -53,6 +54,9 @@ __all__ = [
     "LoginAudit",
     "Lead",
     "LeadStatus",
+    "Campaign",
+    "CampaignSubmission",
+    "MarketingForm",
     "Material",
     "MaterialAccess",
     "MaterialKind",

@@ -2,7 +2,7 @@
 
 > 面向企业的数字名片与客户经营平台，让名片成为品牌展示、客户连接和业务增长的数字入口。
 
-![Version](https://img.shields.io/badge/version-1.1.0-26734d.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-26734d.svg)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776ab.svg)
 ![Node](https://img.shields.io/badge/Node.js-22+-339933.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)
@@ -11,7 +11,7 @@
 
 ## 当前版本
 
-V1.1.0 在稳定 MVP 上增加经营数据分析，当前仓库包含：
+V1.2.0 在经营分析基础上增加轻量营销获客，当前仓库包含：
 
 - FastAPI 后端服务、统一错误响应、请求日志和请求 ID；
 - 应用存活检查、数据库就绪检查和自动 OpenAPI 文档；
@@ -75,6 +75,10 @@ V1.1.0 在稳定 MVP 上增加经营数据分析，当前仓库包含：
 - 企业、部门、员工、名片、产品和渠道维度筛选与排行；
 - 趋势、转化漏斗、抽样追溯、机器人/内部流量过滤和权限导出；
 - 指标计算与去重口径、最后更新时间和大数据量查询性能基线。
+- 可配置字段、必填规则、隐私说明和提交结果的营销表单；
+- 带起止时间、人数限制、名片/产品/渠道绑定的公开活动页；
+- 报名快照、状态管理、权限导出、线索转换和活动效果统计；
+- 24 小时重复识别、分钟级频率限制、蜜罐和机器人基础过滤。
 
 当前版本不包含报价单、合同、回款、复杂销售预测、短信和企业微信通知、库存、购物车及订单支付。完整文档包括 [经营分析口径](docs/ANALYTICS.md)、[API](docs/API_REFERENCE.md)、[部署](docs/DEPLOYMENT.md)、[运维](docs/OPERATIONS.md)、[隐私与安全](docs/PRIVACY_AND_SECURITY.md)、[用户指南](docs/USER_GUIDE.md)、[发布与缺陷响应](docs/RELEASE_AND_INCIDENTS.md) 及 [版本迭代需求](docs/ITERATION_REQUIREMENTS.md)。
 
@@ -369,7 +373,8 @@ DigitalCard/
 - [x] **V0.9.0：客户档案与销售跟进** — 客户、跟进、时间线、商机、漏斗与合并
 - [x] **V1.0.0：数字名片 MVP 稳定发布** — 初始化、备份、监控与发布保障
 - [x] **V1.1.0：经营数据分析** — 统一事件、六维看板、漏斗、过滤与报表导出
-- [ ] **V1.2.0～V1.5.0：经营平台** — 营销、SaaS、AI 与开放平台
+- [x] **V1.2.0：营销表单与活动** — 动态表单、活动报名、风控、转线索与效果统计
+- [ ] **V1.3.0～V1.5.0：经营平台** — SaaS、AI 与开放平台
 
 完整范围、依赖关系和验收条件见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
 
