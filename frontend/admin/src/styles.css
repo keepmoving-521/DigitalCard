@@ -12,19 +12,22 @@ button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 h1, h2, p { overflow-wrap: anywhere; }
 .app-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
-.sidebar { position: sticky; top: 0; height: 100vh; padding: 30px 22px; background: #13261d; color: #dfe9e3; display: flex; flex-direction: column; }
+.sidebar { position: sticky; top: 0; box-sizing: border-box; width: 100%; height: 100vh; height: 100dvh; min-height: 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 30px 22px; background: #13261d; color: #dfe9e3; display: flex; flex-direction: column; }
 .brand { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 750; }
 .brand-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; background: #77e3a2; color: #13261d; }
 .brand-light { position: relative; z-index: 2; color: white; }
-.sidebar nav { display: grid; gap: 7px; margin-top: 58px; }
+.sidebar nav { display: grid; flex: none; gap: 7px; margin-top: 38px; }
 .nav-item { padding: 12px 14px; border-radius: 10px; color: #a9b9b0; }
-.nav-item:hover, .nav-item.router-link-active { color: white; background: #203a2d; }
+.nav-item:hover, .nav-item.router-link-exact-active { color: white; background: #203a2d; }
 .sidebar-user { display: flex; align-items: center; gap: 10px; margin-top: auto; padding: 14px 0; border-top: 1px solid #294034; }
 .sidebar-user .avatar { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; color: #123020; background: #a4e8bc; font-weight: 800; }
 .sidebar-user div { min-width: 0; }
 .sidebar-user b, .sidebar-user small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sidebar-user b { font-size: 13px; }
 .sidebar-user small { margin-top: 3px; color: #81978b; font-size: 10px; }
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { border: 2px solid #13261d; border-radius: 8px; background: #476354; }
 .text-button { padding: 7px 0; border: 0; color: #a9b9b0; background: transparent; text-align: left; }
 .text-button:hover { color: white; }
 .version { margin-top: 18px; color: #6f887a; font-size: 11px; }
@@ -207,7 +210,7 @@ td code { display: block; max-width: 340px; overflow: hidden; text-overflow: ell
 
 @media (max-width: 720px) {
   .app-shell { grid-template-columns: 1fr; }
-  .sidebar { position: static; height: auto; padding: 16px 18px; flex-direction: row; align-items: center; gap: 12px; }
+  .sidebar { position: static; height: auto; min-height: auto; overflow: visible; padding: 16px 18px; flex-direction: row; align-items: center; gap: 12px; }
   .sidebar nav { display: flex; margin: 0 0 0 auto; }
   .nav-item { padding: 9px; font-size: 12px; }
   .sidebar-user, .text-button, .version { display: none; }
