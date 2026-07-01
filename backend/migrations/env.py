@@ -6,6 +6,8 @@ from sqlalchemy import engine_from_config, pool
 from digitalcard.core.config import get_settings
 from digitalcard.db.base import Base
 from digitalcard.models import (  # noqa: F401
+    AiConfiguration,
+    AiInteraction,
     BusinessEvent,
     Campaign,
     CampaignSubmission,
@@ -20,6 +22,7 @@ from digitalcard.models import (  # noqa: F401
     Employee,
     EmployeeInvitation,
     FollowUp,
+    KnowledgeSource,
     Lead,
     LoginAudit,
     MarketingForm,

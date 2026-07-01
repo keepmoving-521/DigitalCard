@@ -30,6 +30,7 @@ function testRouter() {
       { path: '/analytics', component: { template: '<div>Analytics</div>' } },
       { path: '/company/marketing', component: { template: '<div>Marketing</div>' } },
       { path: '/platform/saas', component: { template: '<div>SaaS</div>' } },
+      { path: '/company/knowledge-ai', component: { template: '<div>AI</div>' } },
       { path: '/notifications', component: { template: '<div>Notifications</div>' } },
       { path: '/company/cards/:employeeId', component: { template: '<div>Card</div>' } },
       { path: '/my-card', component: { template: '<div>My card</div>' } },

@@ -12,6 +12,7 @@ from digitalcard.models.crm import (
     OpportunityStageHistory,
 )
 from digitalcard.models.employee import Employee, EmployeeInvitation, EmployeeStatus
+from digitalcard.models.knowledge import AiConfiguration, AiInteraction, KnowledgeSource
 from digitalcard.models.lead import Lead, LeadStatus, Notification
 from digitalcard.models.marketing import Campaign, CampaignSubmission, MarketingForm
 from digitalcard.models.organization import (
@@ -64,6 +65,9 @@ __all__ = [
     "Campaign",
     "CampaignSubmission",
     "MarketingForm",
+    "AiConfiguration",
+    "AiInteraction",
+    "KnowledgeSource",
     "Material",
     "MaterialAccess",
     "MaterialKind",

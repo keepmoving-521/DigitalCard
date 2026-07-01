@@ -1,0 +1,3 @@
+export interface AiConfig { company_id: string; enabled: boolean; public_qa_enabled: boolean; sales_assistant_enabled: boolean; welcome_message: string; system_prompt: string; daily_limit: number; updated_at: string }
+export interface KnowledgeSource { id: string; source_type: string; source_id: string | null; title: string; content: string; is_authorized: boolean; status: 'pending' | 'indexed' | 'disabled' | 'failed'; error_message: string | null; indexed_at: string | null; updated_at: string }
+export interface AiStats { calls: number; successes: number; failures: number; uncertain: number; positive_feedback: number; negative_feedback: number; failure_rate: number }

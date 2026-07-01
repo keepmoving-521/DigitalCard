@@ -12,7 +12,7 @@ describe('H5 App', () => {
   it('renders the mobile foundation page', () => {
     const wrapper = mount(App)
     expect(wrapper.get('h1').text()).toContain('走向下一步')
-    expect(wrapper.text()).toContain('SAAS READY')
+    expect(wrapper.text()).toContain('AI READY')
   })
 
   it('renders a published card and share QR entry', async () => {
@@ -94,5 +94,19 @@ describe('H5 App', () => {
     const call = fetchMock.mock.calls.find(([url]) => String(url).includes('/submissions'))
     expect(JSON.parse(String(call?.[1]?.body))).toMatchObject({ source: 'poster', privacy_agreed: true })
     expect(wrapper.text()).toContain('报名成功')
+  })
+
+  it('answers public AI questions with sources and an advisory notice', async () => {
+    window.history.pushState({}, '', '/ai/company-a')
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ interaction_id: 'ai-1', answer: '标准交付周期是七个工作日。', uncertain: false, citations: [{ source_id: 'source-1', title: '交付周期', excerpt: '标准交付周期是七个工作日。' }], handoff_url: '/card/card-1?source=ai', suggestion_notice: 'AI 内容仅供参考' }) })
+    vi.stubGlobal('fetch', fetchMock)
+    const wrapper = mount(App)
+    await wrapper.get('.campaign-page textarea').setValue('交付周期多久？')
+    await wrapper.get('.campaign-page form').trigger('submit')
+    await flushPromises()
+    expect(wrapper.text()).toContain('七个工作日')
+    expect(wrapper.text()).toContain('交付周期')
+    expect(wrapper.text()).toContain('AI 内容仅供参考')
+    expect(wrapper.get('a').text()).toContain('转人工')
   })
 })

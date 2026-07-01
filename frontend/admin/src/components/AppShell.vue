@@ -22,6 +22,7 @@ async function signOut() {
         <RouterLink class="nav-item" to="/dashboard">工作台</RouterLink>
         <RouterLink v-if="hasPermission('analytics.read')" class="nav-item" to="/analytics">经营分析</RouterLink>
         <RouterLink v-if="hasPermission('marketing.read')" class="nav-item" to="/company/marketing">营销活动</RouterLink>
+        <RouterLink v-if="hasPermission('knowledge.manage')" class="nav-item" to="/company/knowledge-ai">知识库与 AI</RouterLink>
         <RouterLink v-if="hasPermission('company.read')" class="nav-item" to="/onboarding">初始化向导</RouterLink>
         <RouterLink v-if="authState.user?.role === 'platform_admin'" class="nav-item" to="/platform/companies">
           企业管理
@@ -67,7 +68,7 @@ async function signOut() {
         <div><b>{{ authState.user?.display_name }}</b><small>{{ authState.user?.email }}</small></div>
       </div>
       <button class="text-button" type="button" @click="signOut">安全退出</button>
-      <span class="version">V1.3.0 · SaaS 运营</span>
+      <span class="version">V1.4.0 · 知识库与 AI</span>
     </aside>
     <main class="page-content"><slot /></main>
   </div>

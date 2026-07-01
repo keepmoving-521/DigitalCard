@@ -26,6 +26,7 @@ import OnboardingView from './views/OnboardingView.vue'
 import AnalyticsView from './views/AnalyticsView.vue'
 import MarketingView from './views/MarketingView.vue'
 import SaasOperationsView from './views/SaasOperationsView.vue'
+import KnowledgeAiView from './views/KnowledgeAiView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -37,6 +38,7 @@ const router = createRouter({
     { path: '/analytics', component: AnalyticsView, meta: { requiresAuth: true, permission: 'analytics.read' } },
     { path: '/company/marketing', component: MarketingView, meta: { requiresAuth: true, permission: 'marketing.read' } },
     { path: '/platform/saas', component: SaasOperationsView, meta: { requiresAuth: true, platform: true } },
+    { path: '/company/knowledge-ai', component: KnowledgeAiView, meta: { requiresAuth: true, permission: 'knowledge.manage' } },
     { path: '/onboarding', component: OnboardingView, meta: { requiresAuth: true, permission: 'company.read' } },
     { path: '/company/monitoring', component: MonitoringView, meta: { requiresAuth: true, permission: 'audit.read' } },
     {
