@@ -11,6 +11,7 @@ from digitalcard.api.routes.knowledge import router as knowledge_router
 from digitalcard.api.routes.leads import router as leads_router
 from digitalcard.api.routes.marketing import router as marketing_router
 from digitalcard.api.routes.materials import router as materials_router
+from digitalcard.api.routes.open_platform import router as open_platform_router
 from digitalcard.api.routes.operations import router as operations_router
 from digitalcard.api.routes.platform_companies import router as platform_companies_router
 from digitalcard.api.routes.products import router as products_router
@@ -38,3 +39,4 @@ api_router.include_router(analytics_router)
 api_router.include_router(marketing_router)
 api_router.include_router(saas_router)
 api_router.include_router(knowledge_router)
+api_router.include_router(open_platform_router)

@@ -27,7 +27,11 @@ from digitalcard.models import (  # noqa: F401
     LoginAudit,
     MarketingForm,
     Material,
+    MessagePreference,
     Notification,
+    OpenApiCallLog,
+    OpenApplication,
+    OpenIdempotency,
     Opportunity,
     OpportunityStage,
     OpportunityStageHistory,
@@ -43,6 +47,8 @@ from digitalcard.models import (  # noqa: F401
     TenantSubscription,
     TenantSupportGrant,
     User,
+    WebhookDelivery,
+    WebhookSubscription,
 )
 
 config = context.config

@@ -15,6 +15,14 @@ from digitalcard.models.employee import Employee, EmployeeInvitation, EmployeeSt
 from digitalcard.models.knowledge import AiConfiguration, AiInteraction, KnowledgeSource
 from digitalcard.models.lead import Lead, LeadStatus, Notification
 from digitalcard.models.marketing import Campaign, CampaignSubmission, MarketingForm
+from digitalcard.models.open_platform import (
+    MessagePreference,
+    OpenApiCallLog,
+    OpenApplication,
+    OpenIdempotency,
+    WebhookDelivery,
+    WebhookSubscription,
+)
 from digitalcard.models.organization import (
     Company,
     CompanyStatus,
@@ -72,6 +80,12 @@ __all__ = [
     "MaterialAccess",
     "MaterialKind",
     "Notification",
+    "MessagePreference",
+    "OpenApiCallLog",
+    "OpenApplication",
+    "OpenIdempotency",
+    "WebhookDelivery",
+    "WebhookSubscription",
     "Opportunity",
     "OpportunityStage",
     "OpportunityStageHistory",

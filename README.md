@@ -2,7 +2,7 @@
 
 > 面向企业的数字名片与客户经营平台，让名片成为品牌展示、客户连接和业务增长的数字入口。
 
-![Version](https://img.shields.io/badge/version-1.4.0-26734d.svg)
+![Version](https://img.shields.io/badge/version-1.5.0-26734d.svg)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776ab.svg)
 ![Node](https://img.shields.io/badge/Node.js-22+-339933.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)
@@ -11,7 +11,7 @@
 
 ## 当前版本
 
-V1.4.0 增加租户隔离的企业知识库与 AI 助手，当前仓库包含：
+V1.5.0 增加消息中心与安全开放平台，当前仓库包含：
 
 - FastAPI 后端服务、统一错误响应、请求日志和请求 ID；
 - 应用存活检查、数据库就绪检查和自动 OpenAPI 文档；
@@ -87,6 +87,10 @@ V1.4.0 增加租户隔离的企业知识库与 AI 助手，当前仓库包含：
 - 来源停用、更新同步、失败重试和严格租户隔离检索；
 - 带来源引用、不确定性拒答、转人工入口和反馈的公开 AI 问答；
 - 企业介绍、产品文案和跟进建议草稿，以及用量、失败率和反馈审计。
+- 新线索、待跟进和配额预警模板，以及未读、已读和消息偏好；
+- 只展示一次的应用凭据、密钥轮换、权限作用域、限流和调用日志；
+- 线索创建和客户更新 Open API，以及严格应用/租户隔离；
+- Webhook 签名、稳定幂等键、指数退避重试和失败原因查询。
 
 当前版本不包含报价单、合同、回款、复杂销售预测、短信和企业微信通知、库存、购物车及订单支付。完整文档包括 [经营分析口径](docs/ANALYTICS.md)、[API](docs/API_REFERENCE.md)、[部署](docs/DEPLOYMENT.md)、[运维](docs/OPERATIONS.md)、[隐私与安全](docs/PRIVACY_AND_SECURITY.md)、[用户指南](docs/USER_GUIDE.md)、[发布与缺陷响应](docs/RELEASE_AND_INCIDENTS.md) 及 [版本迭代需求](docs/ITERATION_REQUIREMENTS.md)。
 
@@ -384,7 +388,7 @@ DigitalCard/
 - [x] **V1.2.0：营销表单与活动** — 动态表单、活动报名、风控、转线索与效果统计
 - [x] **V1.3.0：SaaS 运营与套餐配额** — 套餐、订阅、配额、注销与临时授权
 - [x] **V1.4.0：企业知识库与 AI 助手** — 授权知识、来源问答、建议草稿与审计
-- [ ] **V1.5.0：开放平台** — 开放接口与生态集成
+- [x] **V1.5.0：消息中心与开放平台** — 消息偏好、Open API、Webhook 与开发者文档
 
 完整范围、依赖关系和验收条件见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。
 

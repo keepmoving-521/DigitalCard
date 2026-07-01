@@ -1,4 +1,4 @@
-# DigitalCard V1.4 API 使用说明
+# DigitalCard V1.5 API 使用说明
 
 服务启动后访问 `/docs` 查看 Swagger UI，访问 `/openapi.json` 获取机器可读的 OpenAPI 文档。业务接口统一使用 `/api/v1` 前缀。
 
@@ -26,6 +26,7 @@
 | 营销活动 | `/tenant/marketing`、`/public/campaigns` | 表单、活动、报名、统计、导出和线索转换 |
 | SaaS 运营 | `/platform/saas` | 套餐、订阅、用量、注销、运营日志和临时授权 |
 | 知识与 AI | `/tenant/knowledge`、`/tenant/ai`、`/public/ai` | 知识索引、配置、来源问答、草稿和审计 |
+| 开放平台 | `/tenant/open`、`/open/v1` | 应用、凭据、Webhook、日志及版本化开放接口 |
 
 ## 经营分析
 

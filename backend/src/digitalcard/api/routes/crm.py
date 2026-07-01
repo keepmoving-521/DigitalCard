@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from digitalcard.api.dependencies import require_permission
 from digitalcard.api.routes.leads import current_employee, visible_lead
+from digitalcard.core.config import Settings, get_settings
 from digitalcard.core.errors import AppError
 from digitalcard.core.time import utc_now
 from digitalcard.db.session import get_db
@@ -49,6 +50,7 @@ from digitalcard.schemas.crm import (
     TimelineEventResponse,
 )
 from digitalcard.services.analytics import add_business_event
+from digitalcard.services.open_platform import enqueue_webhooks
 from digitalcard.services.permissions import Permission, permissions_for_user
 from digitalcard.services.tenancy import record_tenant_audit
 
@@ -253,10 +255,19 @@ def update_customer(
     payload: CustomerUpdateRequest,
     user: Annotated[User, Depends(require_permission(Permission.CUSTOMER_READ))],
     db: Annotated[Session, Depends(get_db)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> Customer:
     customer = visible_customer(db, user, customer_id, True)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(customer, field, value)
+    enqueue_webhooks(
+        db,
+        settings,
+        customer.company_id,
+        "customer.updated",
+        customer.id,
+        {"customer_id": customer.id},
+    )
     db.commit()
     db.refresh(customer)
     return customer

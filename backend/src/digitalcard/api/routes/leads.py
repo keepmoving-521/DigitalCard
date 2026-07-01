@@ -9,12 +9,15 @@ from sqlalchemy.orm import Session
 
 from digitalcard.api.dependencies import require_permission
 from digitalcard.api.routes.public_cards import published_card
+from digitalcard.core.config import Settings, get_settings
 from digitalcard.core.errors import AppError
 from digitalcard.core.time import utc_now
 from digitalcard.db.session import get_db
 from digitalcard.models.account import User, UserRole
+from digitalcard.models.crm import Customer, FollowUp
 from digitalcard.models.employee import Employee, EmployeeStatus
 from digitalcard.models.lead import Lead, LeadStatus, Notification
+from digitalcard.models.open_platform import MessagePreference
 from digitalcard.models.product import Product, ProductStatus
 from digitalcard.schemas.lead import (
     LeadAssignRequest,
@@ -25,7 +28,9 @@ from digitalcard.schemas.lead import (
     PublicLeadCreateRequest,
     PublicLeadCreateResponse,
 )
+from digitalcard.schemas.open_platform import MessagePreferencePayload, MessagePreferenceResponse
 from digitalcard.services.analytics import add_business_event
+from digitalcard.services.open_platform import enqueue_webhooks
 from digitalcard.services.permissions import Permission, permissions_for_user
 from digitalcard.services.tenancy import record_tenant_audit
 
@@ -62,6 +67,9 @@ def visible_lead(db: Session, user: User, lead_id: str) -> Lead:
 def notify_user(db: Session, user_id: str | None, company_id: str, lead: Lead, title: str) -> None:
     if not user_id:
         return
+    preference = db.get(MessagePreference, user_id)
+    if preference is not None and not preference.new_lead:
+        return
     db.add(
         Notification(
             company_id=company_id,
@@ -85,6 +93,7 @@ def create_public_lead(
     card_id: str,
     payload: PublicLeadCreateRequest,
     db: Annotated[Session, Depends(get_db)],
+    settings: Annotated[Settings, Depends(get_settings)],
 ) -> PublicLeadCreateResponse:
     card = published_card(db, card_id)
     if payload.product_id:
@@ -166,6 +175,14 @@ def create_public_lead(
     )
     for admin in admins:
         notify_user(db, admin.id, card.company_id, lead, "企业收到新线索")
+    enqueue_webhooks(
+        db,
+        settings,
+        card.company_id,
+        "lead.created",
+        lead.id,
+        {"lead_id": lead.id, "card_id": card.id, "source": lead.source},
+    )
     db.commit()
     return PublicLeadCreateResponse(id=lead.id, duplicate=False, message="咨询已提交")
 
@@ -325,3 +342,92 @@ def read_notification(
         raise AppError("notification_not_found", "Notification was not found", 404)
     notification.read_at = utc_now()
     db.commit()
+
+
+@router.post("/tenant/notifications/read-all", status_code=status.HTTP_204_NO_CONTENT)
+def read_all_notifications(
+    user: Annotated[User, Depends(require_permission(Permission.NOTIFICATION_READ))],
+    db: Annotated[Session, Depends(get_db)],
+) -> None:
+    db.query(Notification).filter(
+        Notification.user_id == user.id, Notification.read_at.is_(None)
+    ).update({"read_at": utc_now()})
+    db.commit()
+
+
+@router.get("/tenant/notifications/preferences", response_model=MessagePreferenceResponse)
+def get_message_preferences(
+    user: Annotated[User, Depends(require_permission(Permission.NOTIFICATION_READ))],
+    db: Annotated[Session, Depends(get_db)],
+):
+    preference = db.get(MessagePreference, user.id)
+    if preference is None:
+        preference = MessagePreference(user_id=user.id)
+        db.add(preference)
+        db.commit()
+        db.refresh(preference)
+    return preference
+
+
+@router.put("/tenant/notifications/preferences", response_model=MessagePreferenceResponse)
+def update_message_preferences(
+    payload: MessagePreferencePayload,
+    user: Annotated[User, Depends(require_permission(Permission.NOTIFICATION_READ))],
+    db: Annotated[Session, Depends(get_db)],
+):
+    preference = db.get(MessagePreference, user.id)
+    if preference is None:
+        preference = MessagePreference(user_id=user.id)
+        db.add(preference)
+    for key, value in payload.model_dump().items():
+        setattr(preference, key, value)
+    db.commit()
+    db.refresh(preference)
+    return preference
+
+
+@router.post("/tenant/notifications/reminders/sync")
+def sync_follow_up_reminders(
+    user: Annotated[User, Depends(require_permission(Permission.NOTIFICATION_READ))],
+    db: Annotated[Session, Depends(get_db)],
+):
+    preference = db.get(MessagePreference, user.id)
+    if preference is not None and not preference.follow_up_due:
+        return {"created": 0}
+    employee = current_employee(db, user)
+    if employee is None:
+        return {"created": 0}
+    follow_ups = db.scalars(
+        select(FollowUp)
+        .join(Customer, Customer.id == FollowUp.customer_id)
+        .where(
+            FollowUp.company_id == user.company_id,
+            Customer.owner_employee_id == employee.id,
+            FollowUp.next_follow_up_at.is_not(None),
+            FollowUp.next_follow_up_at <= utc_now(),
+        )
+    )
+    created = 0
+    for follow_up in follow_ups:
+        exists = db.scalar(
+            select(Notification.id).where(
+                Notification.user_id == user.id,
+                Notification.kind == "follow_up_due",
+                Notification.related_id == follow_up.id,
+            )
+        )
+        if not exists:
+            db.add(
+                Notification(
+                    company_id=user.company_id,
+                    user_id=user.id,
+                    kind="follow_up_due",
+                    title="客户待跟进提醒",
+                    content="您有一条客户跟进任务已到期，请及时处理。",
+                    related_type="follow_up",
+                    related_id=follow_up.id,
+                )
+            )
+            created += 1
+    db.commit()
+    return {"created": created}

@@ -57,6 +57,7 @@ class Permission(StrEnum):
     KNOWLEDGE_MANAGE = "knowledge.manage"
     AI_GENERATE = "ai.generate"
     AI_AUDIT = "ai.audit"
+    OPEN_PLATFORM_MANAGE = "open_platform.manage"
 
 
 PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
@@ -106,6 +107,7 @@ PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
     Permission.KNOWLEDGE_MANAGE.value: ("管理企业知识库与 AI 配置", "AI"),
     Permission.AI_GENERATE.value: ("使用 AI 生成建议草稿", "AI"),
     Permission.AI_AUDIT.value: ("查看 AI 用量、失败和反馈", "AI"),
+    Permission.OPEN_PLATFORM_MANAGE.value: ("管理开放应用、Webhook 和调用日志", "开放平台"),
 }
 
 ROLE_DEFINITIONS: dict[UserRole, tuple[str, str]] = {
@@ -144,6 +146,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.KNOWLEDGE_MANAGE.value,
         Permission.AI_GENERATE.value,
         Permission.AI_AUDIT.value,
+        Permission.OPEN_PLATFORM_MANAGE.value,
     },
     UserRole.SALES: {
         Permission.COMPANY_READ.value,

@@ -1,0 +1,2 @@
+export interface OpenApplication { id: string; name: string; app_key: string; scopes: string[]; rate_limit_per_minute: number; is_active: boolean; last_used_at: string | null; created_at: string }
+export interface WebhookDelivery { id: string; event_type: string; event_id: string; idempotency_key: string; status: string; attempts: number; response_status: number | null; error_message: string | null; created_at: string }
