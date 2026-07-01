@@ -22,7 +22,7 @@ class Permission(StrEnum):
     ROLE_UPDATE = "role.update"
     AUDIT_READ = "audit.read"
     CONTENT_MANAGE = "content.manage"
-    CUSTOMER_MANAGE = "customer.manage"
+    CUSTOMER_ALL_MANAGE = "customer.all_manage"
     EMPLOYEE_READ = "employee.read"
     EMPLOYEE_CREATE = "employee.create"
     EMPLOYEE_UPDATE = "employee.update"
@@ -43,6 +43,11 @@ class Permission(StrEnum):
     LEAD_MANAGE = "lead.manage"
     LEAD_CLAIM = "lead.claim"
     NOTIFICATION_READ = "notification.read"
+    CUSTOMER_READ = "customer.read"
+    CUSTOMER_MANAGE = "customer.manage"
+    CUSTOMER_SELF_MANAGE = "customer.self_manage"
+    OPPORTUNITY_MANAGE = "opportunity.manage"
+    OPPORTUNITY_STAGE_MANAGE = "opportunity.stage.manage"
 
 
 PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
@@ -78,6 +83,11 @@ PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
     Permission.LEAD_MANAGE.value: ("分配和管理销售线索", "线索"),
     Permission.LEAD_CLAIM.value: ("领取和处理本人线索", "线索"),
     Permission.NOTIFICATION_READ.value: ("查看站内通知", "通知"),
+    Permission.CUSTOMER_READ.value: ("查看客户档案", "客户"),
+    Permission.CUSTOMER_ALL_MANAGE.value: ("管理和转移企业全部客户", "客户"),
+    Permission.CUSTOMER_SELF_MANAGE.value: ("维护本人负责的客户", "客户"),
+    Permission.OPPORTUNITY_MANAGE.value: ("管理客户商机", "商机"),
+    Permission.OPPORTUNITY_STAGE_MANAGE.value: ("配置商机阶段", "商机"),
 }
 
 ROLE_DEFINITIONS: dict[UserRole, tuple[str, str]] = {
@@ -106,6 +116,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.MATERIAL_MANAGE.value,
         Permission.LEAD_READ.value,
         Permission.NOTIFICATION_READ.value,
+        Permission.CUSTOMER_READ.value,
     },
     UserRole.SALES: {
         Permission.COMPANY_READ.value,
@@ -121,6 +132,9 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.LEAD_READ.value,
         Permission.LEAD_CLAIM.value,
         Permission.NOTIFICATION_READ.value,
+        Permission.CUSTOMER_READ.value,
+        Permission.CUSTOMER_SELF_MANAGE.value,
+        Permission.OPPORTUNITY_MANAGE.value,
     },
     UserRole.EMPLOYEE: {
         Permission.COMPANY_READ.value,

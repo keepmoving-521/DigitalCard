@@ -15,6 +15,7 @@ class LeadStatus(StrEnum):
     CLAIMED = "claimed"
     CONTACTED = "contacted"
     INVALID = "invalid"
+    CONVERTED = "converted"
 
 
 class Lead(Base):
@@ -36,6 +37,9 @@ class Lead(Base):
     )
     assigned_employee_id: Mapped[str | None] = mapped_column(
         ForeignKey("employees.id", ondelete="SET NULL"), nullable=True
+    )
+    converted_customer_id: Mapped[str | None] = mapped_column(
+        ForeignKey("customers.id", ondelete="SET NULL"), nullable=True
     )
     name: Mapped[str] = mapped_column(String(100))
     contact: Mapped[str] = mapped_column(String(320))

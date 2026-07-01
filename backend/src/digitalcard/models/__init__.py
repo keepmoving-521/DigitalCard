@@ -1,5 +1,15 @@
 from digitalcard.models.account import LoginAudit, RefreshSession, User, UserRole
 from digitalcard.models.card import CardEvent, CardEventType, CardStatus, CardTemplate, DigitalCard
+from digitalcard.models.crm import (
+    Customer,
+    CustomerContact,
+    CustomerEvent,
+    CustomerStatus,
+    FollowUp,
+    Opportunity,
+    OpportunityStage,
+    OpportunityStageHistory,
+)
 from digitalcard.models.employee import Employee, EmployeeInvitation, EmployeeStatus
 from digitalcard.models.lead import Lead, LeadStatus, Notification
 from digitalcard.models.organization import (
@@ -27,11 +37,16 @@ __all__ = [
     "CardTemplate",
     "Company",
     "CompanyStatus",
+    "Customer",
+    "CustomerContact",
+    "CustomerEvent",
+    "CustomerStatus",
     "Department",
     "DigitalCard",
     "Employee",
     "EmployeeInvitation",
     "EmployeeStatus",
+    "FollowUp",
     "InactiveEmployeeVisibility",
     "LoginAudit",
     "Lead",
@@ -40,6 +55,9 @@ __all__ = [
     "MaterialAccess",
     "MaterialKind",
     "Notification",
+    "Opportunity",
+    "OpportunityStage",
+    "OpportunityStageHistory",
     "Product",
     "ProductCategory",
     "ProductStatus",

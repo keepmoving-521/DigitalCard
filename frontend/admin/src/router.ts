@@ -19,6 +19,7 @@ import MaterialsView from './views/MaterialsView.vue'
 import ProductsView from './views/ProductsView.vue'
 import LeadsView from './views/LeadsView.vue'
 import NotificationsView from './views/NotificationsView.vue'
+import CustomersView from './views/CustomersView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -89,6 +90,10 @@ const router = createRouter({
     {
       path: '/notifications', component: NotificationsView,
       meta: { requiresAuth: true, permission: 'notification.read' },
+    },
+    {
+      path: '/company/customers', component: CustomersView,
+      meta: { requiresAuth: true, permission: 'customer.read' },
     },
     {
       path: '/company/roles',

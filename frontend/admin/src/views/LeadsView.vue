@@ -1,21 +1,105 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { ApiError, apiRequest, authState } from '../auth'
-import AppShell from '../components/AppShell.vue'
 import type { Employee, EmployeePage } from '../employee'
 import type { Lead, LeadPage, LeadStatus } from '../lead'
+import AppShell from '../components/AppShell.vue'
 
-const leads = ref<Lead[]>([]); const employees = ref<Employee[]>([]); const selected = ref<Lead | null>(null)
-const loading = ref(true); const errorMessage = ref(''); const search = ref(''); const statusFilter = ref('')
+const leads = ref<Lead[]>([])
+const employees = ref<Employee[]>([])
+const selected = ref<Lead | null>(null)
+const loading = ref(true)
+const errorMessage = ref('')
+const message = ref('')
+const search = ref('')
+const statusFilter = ref('')
 const canManage = computed(() => authState.user?.permissions.includes('lead.manage') ?? false)
 const canClaim = computed(() => authState.user?.permissions.includes('lead.claim') ?? false)
-const statusName: Record<LeadStatus, string> = { new: '新线索', assigned: '待领取', claimed: '处理中', contacted: '已联系', invalid: '无效' }
-const employeeName = (id: string | null) => employees.value.find(item => item.id === id)?.name ?? (id ? '已分配员工' : '未分配')
-async function load() { loading.value = true; errorMessage.value = ''; try { const params = new URLSearchParams({ limit: '100' }); if (search.value) params.set('search', search.value); if (statusFilter.value) params.set('status', statusFilter.value); const requests: [Promise<LeadPage>, Promise<EmployeePage | null>] = [apiRequest(`/tenant/leads?${params}`), canManage.value ? apiRequest('/tenant/employees?limit=100') : Promise.resolve(null)]; const [page, employeePage] = await Promise.all(requests); leads.value = page.items; employees.value = employeePage?.items ?? [] } catch (error) { errorMessage.value = error instanceof ApiError ? error.message : '线索加载失败' } finally { loading.value = false } }
-async function assign(employeeId: string) { if (!selected.value) return; try { selected.value = await apiRequest(`/tenant/leads/${selected.value.id}/assign`, { method: 'POST', body: JSON.stringify({ employee_id: employeeId }) }); await load() } catch (error) { errorMessage.value = error instanceof ApiError ? error.message : '线索转交失败' } }
-async function claim(lead: Lead) { try { selected.value = await apiRequest(`/tenant/leads/${lead.id}/claim`, { method: 'POST' }); await load() } catch (error) { errorMessage.value = error instanceof ApiError ? error.message : '线索领取失败' } }
-async function setStatus(lead: Lead, status: 'contacted' | 'invalid') { try { selected.value = await apiRequest(`/tenant/leads/${lead.id}/status`, { method: 'POST', body: JSON.stringify({ status }) }); await load() } catch (error) { errorMessage.value = error instanceof ApiError ? error.message : '状态更新失败' } }
+const statusName: Record<LeadStatus, string> = {
+  new: '新线索', assigned: '待领取', claimed: '处理中', contacted: '已联系',
+  invalid: '无效', converted: '已转客户',
+}
+const employeeName = (id: string | null) =>
+  employees.value.find((item) => item.id === id)?.name ?? (id ? '已分配员工' : '未分配')
+
+async function load() {
+  loading.value = true
+  errorMessage.value = ''
+  try {
+    const params = new URLSearchParams({ limit: '100' })
+    if (search.value) params.set('search', search.value)
+    if (statusFilter.value) params.set('status', statusFilter.value)
+    const [page, employeePage] = await Promise.all([
+      apiRequest<LeadPage>(`/tenant/leads?${params}`),
+      canManage.value ? apiRequest<EmployeePage>('/tenant/employees?limit=100') : null,
+    ])
+    leads.value = page.items
+    employees.value = employeePage?.items ?? []
+  } catch (error) {
+    errorMessage.value = error instanceof ApiError ? error.message : '线索加载失败'
+  } finally { loading.value = false }
+}
+async function assign(employeeId: string) {
+  if (!selected.value) return
+  selected.value = await apiRequest(`/tenant/leads/${selected.value.id}/assign`, {
+    method: 'POST', body: JSON.stringify({ employee_id: employeeId }),
+  })
+  await load()
+}
+async function claim(lead: Lead) {
+  selected.value = await apiRequest(`/tenant/leads/${lead.id}/claim`, { method: 'POST' })
+  await load()
+}
+async function setStatus(lead: Lead, status: 'contacted' | 'invalid') {
+  selected.value = await apiRequest(`/tenant/leads/${lead.id}/status`, {
+    method: 'POST', body: JSON.stringify({ status }),
+  })
+  await load()
+}
+async function convert(lead: Lead) {
+  try {
+    await apiRequest(`/tenant/leads/${lead.id}/convert`, {
+      method: 'POST', body: JSON.stringify({ tags: [] }),
+    })
+    message.value = '线索已转为客户，可前往客户档案继续跟进'
+    selected.value = null
+    await load()
+  } catch (error) {
+    errorMessage.value = error instanceof ApiError ? error.message : '线索转换失败'
+  }
+}
 onMounted(load)
 </script>
 
-<template><AppShell><header class="page-header compact"><div><p class="eyebrow">SALES LEADS</p><h1>客户线索</h1><p>{{ canManage ? '查看、分配并追踪企业公开名片带来的咨询。' : '处理分配给你的客户咨询。' }}</p></div></header><div v-if="errorMessage" class="notice error">{{ errorMessage }}</div><section class="panel employee-filters"><input v-model.trim="search" placeholder="搜索姓名或联系方式" @keyup.enter="load" /><select v-model="statusFilter" @change="load"><option value="">全部状态</option><option v-for="(name, code) in statusName" :key="code" :value="code">{{ name }}</option></select><button class="secondary-button" @click="load">查询</button></section><section class="panel table-panel"><div v-if="loading" class="empty-state">正在加载线索…</div><div v-else-if="!leads.length" class="empty-state">暂无可处理线索</div><table v-else><thead><tr><th>客户</th><th>需求</th><th>来源</th><th>负责人</th><th>状态</th><th>提交时间</th></tr></thead><tbody><tr v-for="lead in leads" :key="lead.id" class="clickable-row" @click="selected = lead"><td><b>{{ lead.name }}</b><small>{{ lead.contact }}<span v-if="lead.duplicate_count"> · 重复 {{ lead.duplicate_count }} 次</span></small></td><td>{{ lead.demand || '未填写' }}</td><td>{{ lead.source }}</td><td>{{ employeeName(lead.assigned_employee_id) }}</td><td><span class="pill" :class="{ inactive: lead.status === 'invalid' }">{{ statusName[lead.status] }}</span></td><td>{{ new Date(lead.created_at).toLocaleString() }}</td></tr></tbody></table></section><div v-if="selected" class="modal-backdrop" @click.self="selected = null"><article class="modal lead-detail"><button class="modal-close" @click="selected = null">×</button><p class="eyebrow">LEAD DETAIL</p><h2>{{ selected.name }}</h2><dl><dt>联系方式</dt><dd>{{ selected.contact }}</dd><dt>需求说明</dt><dd>{{ selected.demand || '未填写' }}</dd><dt>分享来源</dt><dd>{{ selected.source }}</dd><dt>关联产品</dt><dd>{{ selected.product_id || '未指定' }}</dd><dt>重复提交</dt><dd>{{ selected.duplicate_count }} 次</dd><dt>当前状态</dt><dd>{{ statusName[selected.status] }}</dd></dl><label v-if="canManage"><span>转交负责人</span><select :value="selected.assigned_employee_id ?? ''" @change="assign(($event.target as HTMLSelectElement).value)"><option value="" disabled>请选择</option><option v-for="employee in employees.filter(item => item.status === 'active')" :key="employee.id" :value="employee.id">{{ employee.name }}</option></select></label><div class="modal-actions"><button v-if="canClaim && selected.status === 'assigned'" class="primary-button" @click="claim(selected)">领取线索</button><button v-if="selected.status !== 'contacted' && selected.status !== 'invalid'" class="secondary-button" @click="setStatus(selected, 'contacted')">标记已联系</button><button v-if="selected.status !== 'invalid'" class="link-button danger" @click="setStatus(selected, 'invalid')">标记无效</button></div></article></div></AppShell></template>
+<template>
+  <AppShell>
+    <header class="page-header compact">
+      <div><p class="eyebrow">SALES LEADS</p><h1>客户线索</h1><p>{{ canManage ? '查看、分配并追踪企业公开名片带来的咨询。' : '处理分配给你的客户咨询。' }}</p></div>
+    </header>
+    <div v-if="message" class="notice success">{{ message }}</div>
+    <div v-if="errorMessage" class="notice error">{{ errorMessage }}</div>
+    <section class="panel employee-filters">
+      <input v-model.trim="search" placeholder="搜索姓名或联系方式" @keyup.enter="load" />
+      <select v-model="statusFilter" @change="load"><option value="">全部状态</option><option v-for="(name, code) in statusName" :key="code" :value="code">{{ name }}</option></select>
+      <button class="secondary-button" @click="load">查询</button>
+    </section>
+    <section class="panel table-panel">
+      <div v-if="loading" class="empty-state">正在加载线索…</div>
+      <div v-else-if="!leads.length" class="empty-state">暂无可处理线索</div>
+      <table v-else><thead><tr><th>客户</th><th>需求</th><th>来源</th><th>负责人</th><th>状态</th><th>提交时间</th></tr></thead><tbody><tr v-for="lead in leads" :key="lead.id" class="clickable-row" @click="selected = lead"><td><b>{{ lead.name }}</b><small>{{ lead.contact }}<span v-if="lead.duplicate_count"> · 重复 {{ lead.duplicate_count }} 次</span></small></td><td>{{ lead.demand || '未填写' }}</td><td>{{ lead.source }}</td><td>{{ employeeName(lead.assigned_employee_id) }}</td><td><span class="pill" :class="{ inactive: lead.status === 'invalid' }">{{ statusName[lead.status] }}</span></td><td>{{ new Date(lead.created_at).toLocaleString() }}</td></tr></tbody></table>
+    </section>
+    <div v-if="selected" class="modal-backdrop" @click.self="selected = null">
+      <article class="modal lead-detail">
+        <button class="modal-close" @click="selected = null">×</button><p class="eyebrow">LEAD DETAIL</p><h2>{{ selected.name }}</h2>
+        <dl><dt>联系方式</dt><dd>{{ selected.contact }}</dd><dt>需求说明</dt><dd>{{ selected.demand || '未填写' }}</dd><dt>分享来源</dt><dd>{{ selected.source }}</dd><dt>关联产品</dt><dd>{{ selected.product_id || '未指定' }}</dd><dt>重复提交</dt><dd>{{ selected.duplicate_count }} 次</dd><dt>当前状态</dt><dd>{{ statusName[selected.status] }}</dd></dl>
+        <label v-if="canManage"><span>转交负责人</span><select :value="selected.assigned_employee_id ?? ''" @change="assign(($event.target as HTMLSelectElement).value)"><option value="" disabled>请选择</option><option v-for="employee in employees.filter(item => item.status === 'active')" :key="employee.id" :value="employee.id">{{ employee.name }}</option></select></label>
+        <div class="modal-actions">
+          <button v-if="canClaim && selected.status === 'assigned'" class="primary-button" @click="claim(selected)">领取线索</button>
+          <button v-if="selected.status !== 'invalid' && selected.status !== 'converted'" class="primary-button" @click="convert(selected)">转为客户</button>
+          <button v-if="!['contacted', 'invalid', 'converted'].includes(selected.status)" class="secondary-button" @click="setStatus(selected, 'contacted')">标记已联系</button>
+          <button v-if="selected.status !== 'invalid' && selected.status !== 'converted'" class="link-button danger" @click="setStatus(selected, 'invalid')">标记无效</button>
+        </div>
+      </article>
+    </div>
+  </AppShell>
+</template>

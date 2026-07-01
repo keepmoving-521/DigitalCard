@@ -34,7 +34,7 @@ onMounted(loadCard)
 </script>
 
 <template>
-  <main v-if="!cardId" class="landing"><section class="landing-hero"><span class="landing-logo">DC</span><span class="badge">V0.8.0</span><div><p>DIGITAL BUSINESS CARD</p><h1>每一次连接，<br />都能走向下一步。</h1><span>通过专属名片展示企业、产品并承接客户咨询。</span></div></section><section class="landing-info"><p>LEADS READY</p><h2>从名片访问到销售线索</h2><div><article>移动优先公开页</article><article>产品与案例展示</article><article>隐私授权咨询留资</article></div></section></main>
+  <main v-if="!cardId" class="landing"><section class="landing-hero"><span class="landing-logo">DC</span><span class="badge">V0.9.0</span><div><p>DIGITAL BUSINESS CARD</p><h1>每一次连接，<br />都能走向下一步。</h1><span>通过专属名片展示企业、产品并承接客户咨询。</span></div></section><section class="landing-info"><p>LEADS READY</p><h2>从名片访问到销售线索</h2><div><article>移动优先公开页</article><article>产品与案例展示</article><article>隐私授权咨询留资</article></div></section></main>
   <main v-else-if="loading" class="state-page"><span class="state-mark">DC</span><h1>正在打开名片</h1><p>请稍候，正在加载公开信息…</p></main>
   <main v-else-if="unavailable" class="state-page"><span class="state-mark">—</span><h1>{{ unavailable }}</h1><p>名片可能尚未发布、已下线，或所属企业暂时停用。</p></main>
   <main v-else-if="card" class="public-card" :style="{ '--theme': value('theme_color') || '#1c6a42' }">

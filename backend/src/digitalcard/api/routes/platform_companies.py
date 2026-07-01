@@ -14,6 +14,7 @@ from digitalcard.schemas.organization import (
     CompanyResponse,
     CompanyStatusRequest,
 )
+from digitalcard.services.crm import seed_opportunity_stages
 from digitalcard.services.permissions import seed_tenant_roles
 from digitalcard.services.tenancy import record_tenant_audit
 from digitalcard.services.tokens import revoke_all_sessions
@@ -50,6 +51,7 @@ def create_company(
     db.add(company)
     db.flush()
     seed_tenant_roles(db, company.id)
+    seed_opportunity_stages(db, company.id)
     record_tenant_audit(
         db,
         company.id,

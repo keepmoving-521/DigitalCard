@@ -1,4 +1,4 @@
-export type LeadStatus = 'new' | 'assigned' | 'claimed' | 'contacted' | 'invalid'
+export type LeadStatus = 'new' | 'assigned' | 'claimed' | 'contacted' | 'invalid' | 'converted'
 
 export interface Lead {
   id: string; card_id: string; product_id: string | null; owner_employee_id: string
