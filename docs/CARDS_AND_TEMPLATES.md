@@ -11,6 +11,8 @@
 
 这种设计确保企业模板更新、员工编辑中断或错误内容都不会静默影响线上名片。
 
+V0.7.0 起，推荐产品编号及顺序也属于名片草稿和发布快照。保存推荐关系不会立即改变公开端，重新发布名片后才生效；公开端还会过滤已下线产品。
+
 ## 企业默认模板
 
 每个企业维护一个默认模板，包括模板名称、六位十六进制主题色、Logo、四个固定模块的展示顺序、品牌锁定字段和员工可编辑字段。
@@ -55,4 +57,7 @@
 | `GET /api/v1/tenant/cards/{employee_id}/preview` | 企业预览员工草稿 |
 | `POST /api/v1/tenant/cards/{employee_id}/publish` | 企业发布员工名片 |
 | `POST /api/v1/tenant/cards/{employee_id}/offline` | 企业下线员工名片 |
+| `PUT /api/v1/tenant/cards/me/recommendations` | 维护本人名片推荐产品 |
+| `PUT /api/v1/tenant/cards/{employee_id}/recommendations` | 企业代管员工推荐产品 |
 | `GET /api/v1/public/cards/{card_id}` | 获取当前已发布快照 |
+| `GET /api/v1/public/cards/{card_id}/products` | 获取公开快照中的推荐产品 |
