@@ -44,6 +44,8 @@ async function signOut() {
         <RouterLink v-if="hasPermission('material.read')" class="nav-item" to="/company/materials">
           素材库
         </RouterLink>
+        <RouterLink v-if="hasPermission('lead.read')" class="nav-item" to="/company/leads">客户线索</RouterLink>
+        <RouterLink v-if="hasPermission('notification.read')" class="nav-item" to="/notifications">站内通知</RouterLink>
         <RouterLink v-if="hasPermission('role.read')" class="nav-item" to="/company/roles">
           角色权限
         </RouterLink>
@@ -59,7 +61,7 @@ async function signOut() {
         <div><b>{{ authState.user?.display_name }}</b><small>{{ authState.user?.email }}</small></div>
       </div>
       <button class="text-button" type="button" @click="signOut">安全退出</button>
-      <span class="version">V0.7.0 · 产品中心</span>
+      <span class="version">V0.8.0 · 客户线索</span>
     </aside>
     <main class="page-content"><slot /></main>
   </div>

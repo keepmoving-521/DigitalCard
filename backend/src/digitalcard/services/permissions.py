@@ -39,6 +39,10 @@ class Permission(StrEnum):
     PRODUCT_MANAGE = "product.manage"
     MATERIAL_READ = "material.read"
     MATERIAL_MANAGE = "material.manage"
+    LEAD_READ = "lead.read"
+    LEAD_MANAGE = "lead.manage"
+    LEAD_CLAIM = "lead.claim"
+    NOTIFICATION_READ = "notification.read"
 
 
 PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
@@ -70,6 +74,10 @@ PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
     Permission.PRODUCT_MANAGE.value: ("管理企业产品", "产品"),
     Permission.MATERIAL_READ.value: ("查看企业素材", "素材"),
     Permission.MATERIAL_MANAGE.value: ("管理企业素材", "素材"),
+    Permission.LEAD_READ.value: ("查看销售线索", "线索"),
+    Permission.LEAD_MANAGE.value: ("分配和管理销售线索", "线索"),
+    Permission.LEAD_CLAIM.value: ("领取和处理本人线索", "线索"),
+    Permission.NOTIFICATION_READ.value: ("查看站内通知", "通知"),
 }
 
 ROLE_DEFINITIONS: dict[UserRole, tuple[str, str]] = {
@@ -96,6 +104,8 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.PRODUCT_MANAGE.value,
         Permission.MATERIAL_READ.value,
         Permission.MATERIAL_MANAGE.value,
+        Permission.LEAD_READ.value,
+        Permission.NOTIFICATION_READ.value,
     },
     UserRole.SALES: {
         Permission.COMPANY_READ.value,
@@ -108,6 +118,9 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CARD_PUBLISH_SELF.value,
         Permission.PRODUCT_READ.value,
         Permission.MATERIAL_READ.value,
+        Permission.LEAD_READ.value,
+        Permission.LEAD_CLAIM.value,
+        Permission.NOTIFICATION_READ.value,
     },
     UserRole.EMPLOYEE: {
         Permission.COMPANY_READ.value,
@@ -118,6 +131,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CARD_EDIT_SELF.value,
         Permission.CARD_PUBLISH_SELF.value,
         Permission.PRODUCT_READ.value,
+        Permission.NOTIFICATION_READ.value,
     },
 }
 

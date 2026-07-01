@@ -17,6 +17,8 @@ import CardEditorView from './views/CardEditorView.vue'
 import CardTemplateView from './views/CardTemplateView.vue'
 import MaterialsView from './views/MaterialsView.vue'
 import ProductsView from './views/ProductsView.vue'
+import LeadsView from './views/LeadsView.vue'
+import NotificationsView from './views/NotificationsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -79,6 +81,14 @@ const router = createRouter({
       path: '/company/materials',
       component: MaterialsView,
       meta: { requiresAuth: true, permission: 'material.read' },
+    },
+    {
+      path: '/company/leads', component: LeadsView,
+      meta: { requiresAuth: true, permission: 'lead.read' },
+    },
+    {
+      path: '/notifications', component: NotificationsView,
+      meta: { requiresAuth: true, permission: 'notification.read' },
     },
     {
       path: '/company/roles',

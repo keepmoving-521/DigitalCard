@@ -5,6 +5,7 @@ from digitalcard.api.routes.auth import router as auth_router
 from digitalcard.api.routes.cards import router as cards_router
 from digitalcard.api.routes.employees import router as employees_router
 from digitalcard.api.routes.health import router as health_router
+from digitalcard.api.routes.leads import router as leads_router
 from digitalcard.api.routes.materials import router as materials_router
 from digitalcard.api.routes.platform_companies import router as platform_companies_router
 from digitalcard.api.routes.products import router as products_router
@@ -24,3 +25,4 @@ api_router.include_router(cards_router)
 api_router.include_router(public_cards_router)
 api_router.include_router(materials_router)
 api_router.include_router(products_router)
+api_router.include_router(leads_router)

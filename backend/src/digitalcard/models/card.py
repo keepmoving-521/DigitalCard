@@ -83,6 +83,8 @@ class CardEventType(StrEnum):
     VCARD_DOWNLOAD = "vcard_download"
     SHARE_COPY = "share_copy"
     QR_OPEN = "qr_open"
+    PRODUCT_OPEN = "product_open"
+    LEAD_SUBMIT = "lead_submit"
 
 
 class CardEvent(Base):

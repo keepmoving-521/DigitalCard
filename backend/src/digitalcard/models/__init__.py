@@ -1,6 +1,7 @@
 from digitalcard.models.account import LoginAudit, RefreshSession, User, UserRole
 from digitalcard.models.card import CardEvent, CardEventType, CardStatus, CardTemplate, DigitalCard
 from digitalcard.models.employee import Employee, EmployeeInvitation, EmployeeStatus
+from digitalcard.models.lead import Lead, LeadStatus, Notification
 from digitalcard.models.organization import (
     Company,
     CompanyStatus,
@@ -33,9 +34,12 @@ __all__ = [
     "EmployeeStatus",
     "InactiveEmployeeVisibility",
     "LoginAudit",
+    "Lead",
+    "LeadStatus",
     "Material",
     "MaterialAccess",
     "MaterialKind",
+    "Notification",
     "Product",
     "ProductCategory",
     "ProductStatus",

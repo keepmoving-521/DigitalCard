@@ -17,7 +17,7 @@ const roleNames: Record<string, string> = {
       <div>
         <p class="eyebrow">OVERVIEW</p>
         <h1>你好，{{ authState.user?.display_name }}</h1>
-        <p>公开名片、二维码分享与访问追踪已经就绪。</p>
+        <p>公开名片、产品展示与客户线索转化已经就绪。</p>
       </div>
       <span class="status"><i /> 账户安全</span>
     </header>
@@ -27,8 +27,8 @@ const roleNames: Record<string, string> = {
       <article><span>会话策略</span><strong>15 分钟</strong><p>访问令牌短期有效并支持安全刷新</p></article>
     </section>
     <section class="next-card">
-      <div><p class="eyebrow">NEXT ITERATION</p><h2>V0.7.0 · 企业内容与产品展示</h2></div>
-      <span>计划中</span>
+      <div><p class="eyebrow">CURRENT ITERATION</p><h2>V0.8.0 · 客户留资与线索分配</h2></div>
+      <span>已就绪</span>
     </section>
   </AppShell>
 </template>

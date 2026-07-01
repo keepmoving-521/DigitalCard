@@ -2,6 +2,8 @@
 
 > V0.7.0 已在此公开名片基础上增加推荐产品列表和产品详情，产品与素材的公开规则见 [产品中心与素材库说明](PRODUCTS_AND_MATERIALS.md)。
 
+> V0.8.0 已增加带隐私授权的咨询留资入口，能够追溯名片、产品和分享来源，详见 [客户留资、线索分配与站内通知说明](LEADS_AND_NOTIFICATIONS.md)。
+
 ## 公开地址与数据边界
 
 公开名片地址格式为 `PUBLIC_CARD_BASE_URL/{card_id}?source={source}`。本地默认地址示例：
