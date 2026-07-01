@@ -32,9 +32,7 @@ class Lead(Base):
     product_id: Mapped[str | None] = mapped_column(
         ForeignKey("products.id", ondelete="SET NULL"), nullable=True
     )
-    owner_employee_id: Mapped[str] = mapped_column(
-        ForeignKey("employees.id", ondelete="RESTRICT")
-    )
+    owner_employee_id: Mapped[str] = mapped_column(ForeignKey("employees.id", ondelete="RESTRICT"))
     assigned_employee_id: Mapped[str | None] = mapped_column(
         ForeignKey("employees.id", ondelete="SET NULL"), nullable=True
     )

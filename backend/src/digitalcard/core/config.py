@@ -47,4 +47,12 @@ def get_settings() -> Settings:
         and "change-this" in settings.secret_key.get_secret_value().lower()
     ):
         raise ValueError("SECRET_KEY must be replaced before running in production")
+    if settings.app_env == "production":
+        local_values = [
+            *settings.cors_origins_list,
+            settings.invite_base_url,
+            settings.public_card_base_url,
+        ]
+        if any("localhost" in value or "127.0.0.1" in value for value in local_values):
+            raise ValueError("Production browser-facing URLs must not use localhost")
     return settings

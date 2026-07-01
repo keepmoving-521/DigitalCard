@@ -44,9 +44,13 @@ async def setup_leads(client: AsyncClient):  # type: ignore[no-untyped-def]
     card = await client.get("/api/v1/tenant/cards/me", headers=headers(admin))
     published = await client.post("/api/v1/tenant/cards/me/publish", headers=headers(admin))
     assert card.status_code == published.status_code == 200
-    return admin, await sign_in(client, "sales-lead@example.com"), await sign_in(
-        client, "other-sales@example.com"
-    ), sales_employee, published.json()["id"]
+    return (
+        admin,
+        await sign_in(client, "sales-lead@example.com"),
+        await sign_in(client, "other-sales@example.com"),
+        sales_employee,
+        published.json()["id"],
+    )
 
 
 async def test_privacy_duplicate_assignment_and_sales_visibility(client: AsyncClient) -> None:

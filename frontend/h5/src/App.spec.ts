@@ -12,7 +12,7 @@ describe('H5 App', () => {
   it('renders the mobile foundation page', () => {
     const wrapper = mount(App)
     expect(wrapper.get('h1').text()).toContain('走向下一步')
-    expect(wrapper.text()).toContain('LEADS READY')
+    expect(wrapper.text()).toContain('MVP READY')
   })
 
   it('renders a published card and share QR entry', async () => {

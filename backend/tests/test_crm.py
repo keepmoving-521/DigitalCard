@@ -149,21 +149,18 @@ async def test_convert_follow_up_opportunity_history_and_transfer(client: AsyncC
     )
     assert transferred.status_code == 200
     assert (
-        await client.get(
-            f"/api/v1/tenant/customers/{customer_id}", headers=headers(sales_one)
-        )
+        await client.get(f"/api/v1/tenant/customers/{customer_id}", headers=headers(sales_one))
     ).status_code == 404
     assert (
-        await client.get(
-            f"/api/v1/tenant/customers/{customer_id}", headers=headers(sales_two)
-        )
+        await client.get(f"/api/v1/tenant/customers/{customer_id}", headers=headers(sales_two))
     ).status_code == 200
     funnel = await client.get(
         "/api/v1/tenant/opportunities/funnel/summary", headers=headers(sales_two)
     )
-    assert next(item for item in funnel.json()["items"] if item["stage_id"] == proposal["id"])[
-        "count"
-    ] == 1
+    assert (
+        next(item for item in funnel.json()["items"] if item["stage_id"] == proposal["id"])["count"]
+        == 1
+    )
 
 
 async def test_merge_preview_and_merge_preserve_related_records(client: AsyncClient) -> None:
@@ -219,25 +216,29 @@ async def test_merge_preview_and_merge_preserve_related_records(client: AsyncCli
         json={"source_customer_id": source_id},
     )
     assert merged.status_code == 200
-    detail = await client.get(
-        f"/api/v1/tenant/customers/{target_id}", headers=headers(admin)
-    )
+    detail = await client.get(f"/api/v1/tenant/customers/{target_id}", headers=headers(admin))
     assert len(detail.json()["contacts"]) == 3
-    assert len(
-        (
-            await client.get(
-                f"/api/v1/tenant/customers/{target_id}/follow-ups", headers=headers(admin)
-            )
-        ).json()
-    ) == 1
-    assert len(
-        (
-            await client.get(
-                f"/api/v1/tenant/customers/{target_id}/opportunities",
-                headers=headers(admin),
-            )
-        ).json()
-    ) == 1
+    assert (
+        len(
+            (
+                await client.get(
+                    f"/api/v1/tenant/customers/{target_id}/follow-ups", headers=headers(admin)
+                )
+            ).json()
+        )
+        == 1
+    )
+    assert (
+        len(
+            (
+                await client.get(
+                    f"/api/v1/tenant/customers/{target_id}/opportunities",
+                    headers=headers(admin),
+                )
+            ).json()
+        )
+        == 1
+    )
     assert (
         await client.get(f"/api/v1/tenant/customers/{source_id}", headers=headers(admin))
     ).status_code == 404

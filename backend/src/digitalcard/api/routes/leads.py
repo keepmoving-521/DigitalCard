@@ -254,9 +254,8 @@ def update_lead_status(
     db: Annotated[Session, Depends(get_db)],
 ) -> Lead:
     lead = visible_lead(db, user, lead_id)
-    if (
-        not can_manage_leads(db, user)
-        and Permission.LEAD_CLAIM.value not in permissions_for_user(db, user)
+    if not can_manage_leads(db, user) and Permission.LEAD_CLAIM.value not in permissions_for_user(
+        db, user
     ):
         raise AppError("permission_denied", "Permission is required", 403)
     lead.status = payload.status.value
@@ -272,11 +271,14 @@ def list_notifications(
     unread_only: bool = False,
 ) -> NotificationPageResponse:
     conditions = [Notification.user_id == user.id, Notification.company_id == user.company_id]
-    unread_count = db.scalar(
-        select(func.count())
-        .select_from(Notification)
-        .where(*conditions, Notification.read_at.is_(None))
-    ) or 0
+    unread_count = (
+        db.scalar(
+            select(func.count())
+            .select_from(Notification)
+            .where(*conditions, Notification.read_at.is_(None))
+        )
+        or 0
+    )
     if unread_only:
         conditions.append(Notification.read_at.is_(None))
     items = list(

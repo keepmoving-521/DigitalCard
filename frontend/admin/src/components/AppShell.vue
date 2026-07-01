@@ -20,6 +20,7 @@ async function signOut() {
       </RouterLink>
       <nav aria-label="主导航">
         <RouterLink class="nav-item" to="/dashboard">工作台</RouterLink>
+        <RouterLink v-if="hasPermission('company.read')" class="nav-item" to="/onboarding">初始化向导</RouterLink>
         <RouterLink v-if="authState.user?.role === 'platform_admin'" class="nav-item" to="/platform/companies">
           企业管理
         </RouterLink>
@@ -53,6 +54,7 @@ async function signOut() {
         <RouterLink v-if="hasPermission('audit.read')" class="nav-item" to="/company/audits">
           变更审计
         </RouterLink>
+        <RouterLink v-if="hasPermission('audit.read')" class="nav-item" to="/company/monitoring">运行监控</RouterLink>
         <RouterLink class="nav-item" to="/change-password">修改密码</RouterLink>
         <RouterLink v-if="hasPermission('employee.self_update')" class="nav-item" to="/profile">我的资料</RouterLink>
         <RouterLink v-if="hasPermission('card.read')" class="nav-item" to="/my-card">我的名片</RouterLink>
@@ -62,7 +64,7 @@ async function signOut() {
         <div><b>{{ authState.user?.display_name }}</b><small>{{ authState.user?.email }}</small></div>
       </div>
       <button class="text-button" type="button" @click="signOut">安全退出</button>
-      <span class="version">V0.9.0 · 客户 CRM</span>
+      <span class="version">V1.0.0 · MVP 稳定版</span>
     </aside>
     <main class="page-content"><slot /></main>
   </div>

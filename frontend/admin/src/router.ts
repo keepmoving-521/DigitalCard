@@ -20,6 +20,9 @@ import ProductsView from './views/ProductsView.vue'
 import LeadsView from './views/LeadsView.vue'
 import NotificationsView from './views/NotificationsView.vue'
 import CustomersView from './views/CustomersView.vue'
+import MonitoringView from './views/MonitoringView.vue'
+import NotFoundView from './views/NotFoundView.vue'
+import OnboardingView from './views/OnboardingView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,6 +31,8 @@ const router = createRouter({
     { path: '/login', component: LoginView, meta: { guest: true } },
     { path: '/accept-invite', component: AcceptInviteView, meta: { guest: true } },
     { path: '/dashboard', component: DashboardView, meta: { requiresAuth: true } },
+    { path: '/onboarding', component: OnboardingView, meta: { requiresAuth: true, permission: 'company.read' } },
+    { path: '/company/monitoring', component: MonitoringView, meta: { requiresAuth: true, permission: 'audit.read' } },
     {
       path: '/admin/accounts',
       component: AccountsView,
@@ -107,7 +112,7 @@ const router = createRouter({
     },
     { path: '/change-password', component: ChangePasswordView, meta: { requiresAuth: true } },
     { path: '/forbidden', component: ForbiddenView, meta: { requiresAuth: true } },
-    { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
+    { path: '/:pathMatch(.*)*', component: NotFoundView, meta: { requiresAuth: true } },
   ],
 })
 

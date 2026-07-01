@@ -30,6 +30,8 @@ jobs:
           SECRET_KEY: ci-secret-key-that-is-at-least-32-characters
           DATABASE_URL: "sqlite:///:memory:"
         run: uv run alembic -c backend/alembic.ini upgrade head
+      - name: Security release checks
+        run: uv run pytest backend/tests/test_security.py backend/tests/test_backup_restore.py backend/tests/test_mvp_flow.py
 
   frontend:
     runs-on: ubuntu-latest

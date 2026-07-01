@@ -16,6 +16,8 @@ function testRouter() {
       { path: '/login', component: LoginView },
       { path: '/forbidden', component: ForbiddenView },
       { path: '/dashboard', component: { template: '<div>Dashboard</div>' } },
+      { path: '/onboarding', component: { template: '<div>Onboarding</div>' } },
+      { path: '/company/monitoring', component: { template: '<div>Monitoring</div>' } },
       { path: '/change-password', component: { template: '<div>Password</div>' } },
       { path: '/company/settings', component: { template: '<div>Company</div>' } },
       { path: '/company/departments', component: { template: '<div>Departments</div>' } },
