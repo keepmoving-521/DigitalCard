@@ -10,6 +10,14 @@ from digitalcard.models.organization import (
     TenantAudit,
     TenantRole,
 )
+from digitalcard.models.product import (
+    Material,
+    MaterialAccess,
+    MaterialKind,
+    Product,
+    ProductCategory,
+    ProductStatus,
+)
 
 __all__ = [
     "CardStatus",
@@ -25,6 +33,12 @@ __all__ = [
     "EmployeeStatus",
     "InactiveEmployeeVisibility",
     "LoginAudit",
+    "Material",
+    "MaterialAccess",
+    "MaterialKind",
+    "Product",
+    "ProductCategory",
+    "ProductStatus",
     "RefreshSession",
     "RolePermission",
     "TenantAudit",

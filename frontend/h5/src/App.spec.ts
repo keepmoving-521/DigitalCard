@@ -11,8 +11,8 @@ describe('H5 App', () => {
 
   it('renders the mobile foundation page', () => {
     const wrapper = mount(App)
-    expect(wrapper.get('h1').text()).toContain('每一次连接')
-    expect(wrapper.text()).toContain('SHARING READY')
+    expect(wrapper.get('h1').text()).toContain('让产品自己说话')
+    expect(wrapper.text()).toContain('PRODUCT READY')
   })
 
   it('renders a published card and share QR entry', async () => {

@@ -122,6 +122,7 @@ def public_snapshot(data: dict[str, object]) -> dict[str, object]:
         "logo_url",
         "module_order",
         "template_revision",
+        "recommended_product_ids",
     }
     selectable = set(data.get("visible_fields") or [])
     return {

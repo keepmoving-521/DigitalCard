@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     invite_base_url: str = "http://localhost:5173/accept-invite"
     invite_expire_hours: int = Field(default=72, ge=1, le=168)
     public_card_base_url: str = "http://localhost:5174/card"
+    upload_dir: str = "./data/uploads"
+    image_max_bytes: int = Field(default=10 * 1024 * 1024, ge=1024)
+    video_max_bytes: int = Field(default=100 * 1024 * 1024, ge=1024)
+    pdf_max_bytes: int = Field(default=30 * 1024 * 1024, ge=1024)
 
     @property
     def cors_origins_list(self) -> list[str]:

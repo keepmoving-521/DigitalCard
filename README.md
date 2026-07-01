@@ -2,7 +2,7 @@
 
 > 面向企业的数字名片与客户经营平台，让名片成为品牌展示、客户连接和业务增长的数字入口。
 
-![Version](https://img.shields.io/badge/version-0.6.0-26734d.svg)
+![Version](https://img.shields.io/badge/version-0.7.0-26734d.svg)
 ![Python](https://img.shields.io/badge/Python-3.12+-3776ab.svg)
 ![Node](https://img.shields.io/badge/Node.js-22+-339933.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)
@@ -11,7 +11,7 @@
 
 ## 当前版本
 
-V0.6.0 已完成移动公开名片与分享追踪闭环，当前仓库包含：
+V0.7.0 已完成产品中心、企业素材库及名片产品推荐闭环，当前仓库包含：
 
 - FastAPI 后端服务、统一错误响应、请求日志和请求 ID；
 - 应用存活检查、数据库就绪检查和自动 OpenAPI 文档；
@@ -324,7 +324,8 @@ DigitalCard/
 - [x] **V0.4.0：员工管理** — 员工档案、批量导入、账户邀请与个人资料
 - [x] **V0.5.0：名片资料与模板** — 企业模板、员工草稿、实时预览与发布
 - [x] **V0.6.0：H5 名片与分享闭环** — 公开名片、二维码、联系操作与访问追踪
-- [ ] **V0.7.0～V1.0.0：数字名片 MVP** — 产品、线索与 CRM
+- [x] **V0.7.0：产品中心与素材库** — 产品分类、素材、发布、名片推荐与公开详情
+- [ ] **V0.8.0～V1.0.0：数字名片 MVP** — 线索与 CRM
 - [ ] **V1.1.0～V1.5.0：经营平台** — 分析、营销、SaaS、AI 与开放平台
 
 完整范围、依赖关系和验收条件见 [版本迭代需求文档](docs/ITERATION_REQUIREMENTS.md)。

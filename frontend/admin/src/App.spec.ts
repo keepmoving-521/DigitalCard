@@ -1,11 +1,12 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { authState } from './auth'
 import AppShell from './components/AppShell.vue'
 import ForbiddenView from './views/ForbiddenView.vue'
 import LoginView from './views/LoginView.vue'
 import CardPreview from './components/CardPreview.vue'
+import ProductsView from './views/ProductsView.vue'
 
 function testRouter() {
   return createRouter({
@@ -36,6 +37,7 @@ describe('Account foundation views', () => {
     authState.user = null
     authState.accessToken = null
     authState.initialized = false
+    vi.unstubAllGlobals()
   })
   it('renders the login form', async () => {
     const router = testRouter()
@@ -97,5 +99,27 @@ describe('Account foundation views', () => {
     expect(wrapper.text()).toContain('张三')
     expect(wrapper.text()).toContain('13800000000')
     expect(wrapper.classes()).not.toContain('desktop')
+  })
+
+  it('lets an employee browse products without requesting material permission', async () => {
+    authState.user = {
+      id: 'user-2', email: 'employee@example.com', display_name: '普通员工',
+      role: 'employee', company_id: 'company-1', department_id: null,
+      permissions: ['product.read'], is_active: true, must_change_password: false,
+      last_login_at: null, created_at: '', updated_at: '',
+    }
+    authState.accessToken = 'test-token'
+    const fetchMock = vi.fn((url: string) => Promise.resolve(new Response(JSON.stringify(
+      url.includes('product-categories') ? [] : { items: [], total: 0, offset: 0, limit: 100 },
+    ), { status: 200, headers: { 'Content-Type': 'application/json' } })))
+    vi.stubGlobal('fetch', fetchMock)
+    const wrapper = mount(ProductsView, {
+      global: { stubs: { AppShell: { template: '<main><slot /></main>' } } },
+    })
+    await flushPromises()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/tenant/materials'))).toBe(false)
+    expect(wrapper.text()).toContain('浏览企业已维护的产品')
+    expect(wrapper.text()).not.toContain('新增产品')
   })
 })

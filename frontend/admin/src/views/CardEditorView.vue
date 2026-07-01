@@ -11,6 +11,7 @@ import type {
 } from '../card'
 import AppShell from '../components/AppShell.vue'
 import CardPreview from '../components/CardPreview.vue'
+import type { Product, ProductPage } from '../product'
 
 interface Analytics { total_views: number; total_actions: number; by_event: Record<string, number>; by_source: Record<string, number> }
 const route = useRoute()
@@ -31,6 +32,8 @@ const template = ref<CardTemplate | null>(null)
 const basePreview = ref<Record<string, unknown>>({})
 const draftKeys = ref(new Set<string>())
 const analytics = ref<Analytics>({ total_views: 0, total_actions: 0, by_event: {}, by_source: {} })
+const products = ref<Product[]>([])
+const recommendedProductIds = ref<string[]>([])
 const publicOptions = [
   { code: 'headline', name: '职位/标语' }, { code: 'avatar_url', name: '头像' },
   { code: 'bio', name: '个人简介' }, { code: 'phone', name: '电话' },
@@ -66,6 +69,7 @@ function applyCard(card: DigitalCard, preview: Preview) {
   basePreview.value = preview.data
   const data = card.draft_data
   draftKeys.value = new Set(Object.keys(data))
+  recommendedProductIds.value = [...((data.recommended_product_ids ?? []) as string[])]
   Object.assign(form, {
     display_name: String(data.display_name ?? ''), headline: String(data.headline ?? ''),
     avatar_url: String(data.avatar_url ?? ''), bio: String(data.bio ?? ''),
@@ -81,13 +85,15 @@ function applyCard(card: DigitalCard, preview: Preview) {
 async function load() {
   loading.value = true
   try {
-    const [card, preview, templateValue, metricValue] = await Promise.all([
+    const [card, preview, templateValue, metricValue, productPage] = await Promise.all([
       apiRequest<DigitalCard>(basePath.value), apiRequest<Preview>(`${basePath.value}/preview`),
       apiRequest<CardTemplate>('/tenant/card-template'),
       apiRequest<Analytics>(`${basePath.value}/analytics`),
+      apiRequest<ProductPage>('/tenant/products?status=published&limit=100'),
     ])
     template.value = templateValue
     analytics.value = metricValue
+    products.value = productPage.items
     applyCard(card, preview)
   } catch (error) {
     errorMessage.value = error instanceof ApiError ? error.message : '名片加载失败'
@@ -112,6 +118,9 @@ async function save(showMessage = true) {
   saving.value = true
   errorMessage.value = ''
   try {
+    await apiRequest(`${basePath.value}/recommendations`, {
+      method: 'PUT', body: JSON.stringify({ product_ids: recommendedProductIds.value }),
+    })
     const card = await apiRequest<DigitalCard>(basePath.value, {
       method: 'PATCH', body: JSON.stringify(payload()),
     })
@@ -179,6 +188,14 @@ onMounted(load)
         <fieldset class="check-grid">
           <legend>公开展示内容</legend>
           <label v-for="field in publicOptions" :key="field.code"><input v-model="form.visible_fields" type="checkbox" :value="field.code" />{{ field.name }}</label>
+        </fieldset>
+        <fieldset>
+          <legend>推荐产品</legend>
+          <p v-if="!products.length" class="field-hint">暂无已发布产品，请先到产品中心发布产品。</p>
+          <div v-else class="check-grid product-check-grid">
+            <label v-for="product in products" :key="product.id"><input v-model="recommendedProductIds" type="checkbox" :value="product.id" />{{ product.name }}</label>
+          </div>
+          <small class="field-hint">勾选顺序即公开名片中的展示顺序，保存后需重新发布名片才会上线。</small>
         </fieldset>
         <details><summary>个性化样式</summary><label><span>主题色</span><div class="color-field"><input v-model="form.theme_color" :disabled="isLocked('theme_color')" type="color" /><input v-model.trim="form.theme_color" :disabled="isLocked('theme_color')" /></div></label><label><span>Logo 地址</span><input v-model.trim="form.logo_url" :disabled="isLocked('logo_url')" type="url" /></label></details>
         <div class="form-actions"><button class="secondary-button" :disabled="saving">保存草稿</button><button class="primary-button" type="button" @click="publish">发布名片</button><button v-if="status === 'published'" class="link-button danger" type="button" @click="offline">下线</button></div>

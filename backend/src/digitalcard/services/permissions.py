@@ -35,6 +35,10 @@ class Permission(StrEnum):
     CARD_PUBLISH_SELF = "card.publish_self"
     CARD_MANAGE = "card.manage"
     CARD_TEMPLATE_MANAGE = "card.template.manage"
+    PRODUCT_READ = "product.read"
+    PRODUCT_MANAGE = "product.manage"
+    MATERIAL_READ = "material.read"
+    MATERIAL_MANAGE = "material.manage"
 
 
 PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
@@ -62,6 +66,10 @@ PERMISSION_DEFINITIONS: dict[str, tuple[str, str]] = {
     Permission.CARD_PUBLISH_SELF.value: ("发布本人名片", "名片"),
     Permission.CARD_MANAGE.value: ("管理企业员工名片", "名片"),
     Permission.CARD_TEMPLATE_MANAGE.value: ("管理企业名片模板", "名片"),
+    Permission.PRODUCT_READ.value: ("查看企业产品", "产品"),
+    Permission.PRODUCT_MANAGE.value: ("管理企业产品", "产品"),
+    Permission.MATERIAL_READ.value: ("查看企业素材", "素材"),
+    Permission.MATERIAL_MANAGE.value: ("管理企业素材", "素材"),
 }
 
 ROLE_DEFINITIONS: dict[UserRole, tuple[str, str]] = {
@@ -84,6 +92,10 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CARD_PUBLISH_SELF.value,
         Permission.CARD_MANAGE.value,
         Permission.CARD_TEMPLATE_MANAGE.value,
+        Permission.PRODUCT_READ.value,
+        Permission.PRODUCT_MANAGE.value,
+        Permission.MATERIAL_READ.value,
+        Permission.MATERIAL_MANAGE.value,
     },
     UserRole.SALES: {
         Permission.COMPANY_READ.value,
@@ -94,6 +106,8 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CARD_READ.value,
         Permission.CARD_EDIT_SELF.value,
         Permission.CARD_PUBLISH_SELF.value,
+        Permission.PRODUCT_READ.value,
+        Permission.MATERIAL_READ.value,
     },
     UserRole.EMPLOYEE: {
         Permission.COMPANY_READ.value,
@@ -103,6 +117,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[UserRole, set[str]] = {
         Permission.CARD_READ.value,
         Permission.CARD_EDIT_SELF.value,
         Permission.CARD_PUBLISH_SELF.value,
+        Permission.PRODUCT_READ.value,
     },
 }
 

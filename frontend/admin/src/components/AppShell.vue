@@ -38,6 +38,12 @@ async function signOut() {
         <RouterLink v-if="hasPermission('card.template.manage')" class="nav-item" to="/company/card-template">
           名片模板
         </RouterLink>
+        <RouterLink v-if="hasPermission('product.read')" class="nav-item" to="/company/products">
+          产品中心
+        </RouterLink>
+        <RouterLink v-if="hasPermission('material.read')" class="nav-item" to="/company/materials">
+          素材库
+        </RouterLink>
         <RouterLink v-if="hasPermission('role.read')" class="nav-item" to="/company/roles">
           角色权限
         </RouterLink>
@@ -53,7 +59,7 @@ async function signOut() {
         <div><b>{{ authState.user?.display_name }}</b><small>{{ authState.user?.email }}</small></div>
       </div>
       <button class="text-button" type="button" @click="signOut">安全退出</button>
-      <span class="version">V0.6.0 · H5 分享</span>
+      <span class="version">V0.7.0 · 产品中心</span>
     </aside>
     <main class="page-content"><slot /></main>
   </div>

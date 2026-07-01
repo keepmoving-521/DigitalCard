@@ -15,6 +15,8 @@ import MyProfileView from './views/MyProfileView.vue'
 import AcceptInviteView from './views/AcceptInviteView.vue'
 import CardEditorView from './views/CardEditorView.vue'
 import CardTemplateView from './views/CardTemplateView.vue'
+import MaterialsView from './views/MaterialsView.vue'
+import ProductsView from './views/ProductsView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -67,6 +69,16 @@ const router = createRouter({
       path: '/company/cards/:employeeId',
       component: CardEditorView,
       meta: { requiresAuth: true, permission: 'card.manage' },
+    },
+    {
+      path: '/company/products',
+      component: ProductsView,
+      meta: { requiresAuth: true, permission: 'product.read' },
+    },
+    {
+      path: '/company/materials',
+      component: MaterialsView,
+      meta: { requiresAuth: true, permission: 'material.read' },
     },
     {
       path: '/company/roles',
